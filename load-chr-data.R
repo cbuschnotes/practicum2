@@ -15,19 +15,93 @@ library(stringr)
 setwd("/practicum2")
 source("common.R")
 
+scrubnames=function(h2){
+  h2[is.na(h2)]=''
+  h2=tolower(gsub('_+','_',gsub('[-]','_',gsub('\\s+','_',gsub('\\#','num',gsub('\\%','pct',h2))))))
+  h2=gsub('<','lt',h2,fixed = T)
+  h2=gsub('>','gt',h2,fixed=T)
+  h2=gsub('/','over',h2,fixed=T)
+  h2=gsub(',','',h2,fixed=T)
+  h2=gsub("'",'',h2,fixed=T)
+  h2=gsub('^','',h2,fixed=T)
+  h2=gsub('^\\.','',h2,fixed=F,perl=T)
+  h2
+}
 
-filenames=c('2010 County Health Rankings National Data.csv',
-            '2011 County Health Rankings National Data_v2.csv',
-            '2012 County Health Rankings National Data_v2.csv',
-            '2013 County Health Rankings National Data.csv',
-            '2014 County Health Rankings Data - v6.csv',
-            '2015 County Health Rankings Data - v3.csv',
-            '2016 County Health Rankings Data - v3.csv')
+purgeUselessColumn=function(d,pattern){
+  if(length(grep(pattern,names(d)))>0) d=d[,-1*grep(pattern,names(d))]
+  d
+}
+
+purgeUselessColumns=function(d){
+  if(length(grep('95pct_ci_',names(d)))>0) d=d[,-1*grep('95pct_ci_',names(d))]
+  if(length(grep('quartile',names(d)))>0) d=d[,-1*grep('quartile',names(d))]
+  if(length(grep('unreliable',names(d)))>0) d=d[,-1*grep('unreliable',names(d))]
+  if(length(grep('sample_size',names(d)))>0) d=d[,-1*grep('sample_size',names(d))]
+  if(length(grep('_percentile',names(d)))>0) d=d[,-1*grep('_percentile',names(d))]
+  if(length(grep('cohort',names(d)))>0) d=d[,-1*grep('cohort',names(d))]
+  d$na=NULL
+  d
+}
+
+shortenNames=function(d){
+  h=names(d)
+  h=gsub('\\.','_._',h)
+  h2=strsplit(h,'([_])',perl=T)
+  for(i in 1:length(h2)){ #i=7; h2[i]
+    names(d)[i]=gsub('_._','.',paste0(unique(unlist(h2[i])),collapse = '_'),fixed = T)
+  }
+  d
+}
+
+
+
+filenames=Sys.glob('/practicum2/data/county/raw/*.csv')
+filenames=Sys.glob('/practicum2/data/county/xls/*.xls')
+
+require(readxl)
+for(f in filenames){ 
+  message(f)
+  print(excel_sheets(f))
+}
+for(f in filenames){
+  for( sheetname in c("Additional Measure Data","Ranked Measure Data")){
+    if( sheetname %in% excel_sheets(f)){
+      message(f,sheetname)
+      h=as.data.frame(read_excel(f,sheetname ,n_max = 2,col_names = F))
+      row1=h[1,]
+      row2=h[2,]
+      prev=''
+      for(i in 1:ncol(row1)){
+        if(!is.na(row1[i])) prev=row1[i]
+        if(is.na(row1[i])) row1[i]=prev
+      }
+      header=scrubnames(paste0(row1,'.',row2))
+      d=as.data.frame(read_excel(f,sheetname ,skip = 2,col_names = F))
+      names(d)=header
+      d=purgeUselessColumns(d)
+      d=purgeUselessColumn(d,'\\.num')
+      d=shortenNames(d)
+      #View(d)
+    }
+  }
+}
+
+for(f in filenames){ message(f)
+  if("Additional Measure Data" %in% excel_sheets(f)){
+    print(as.data.frame(read_excel(f,"Additional Measure Data" ,n_max = 2,col_names = F)))
+  }
+}
+
+
+as.data.frame(read_excel(filenames[2],"Ranked Measure Data" ,n_max = 2,col_names = F))
+
+read.xlsx(filenames[1],4)
+
 vars=c()
-
 for(f in filenames){ # f='2016 County Health Rankings Data - v3.csv'
-  fn=str_match(f, '^(\\d+)')[,1]
-  h=read.csv(normalizePath(paste0("/practicum2/data/county/raw/",f)),nrows = 1,header=F,as.is = T)
+  fn=str_match(f, '/(\\d+)')[,2]
+  h=read.csv(normalizePath(paste0(f)),nrows = 1,header=F,as.is = T)
   names(h)
   h2=unlist(h)
   h2[is.na(h2)]='NA'
@@ -38,11 +112,7 @@ for(f in filenames){ # f='2016 County Health Rankings Data - v3.csv'
   h2=gsub(',','',h2,fixed=T)
   d=read.csv(      normalizePath(paste0("/practicum2/data/county/raw/",f)))
   names(d)=h2
-  if(length(grep('95pct_ci_',names(d)))>0) d=d[,-1*grep('95pct_ci_',names(d))]
-  if(length(grep('quartile',names(d)))>0) d=d[,-1*grep('quartile',names(d))]
-  if(length(grep('unreliable',names(d)))>0) d=d[,-1*grep('unreliable',names(d))]
-  if(length(grep('sample_size',names(d)))>0) d=d[,-1*grep('sample_size',names(d))]
-  d$na=NULL
+  d=purgeUselessColumns(d)
   vars=c(vars,paste0('chr',fn))
   assign(paste0('chr',fn),d)
 }
