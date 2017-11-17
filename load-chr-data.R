@@ -64,10 +64,12 @@ for(f in filenames){
   message(f)
   print(excel_sheets(f))
 }
+require(stringr)
 for(f in filenames){
+  fn=str_match(f, '/(\\d+)')[,2]
   for( sheetname in c("Additional Measure Data","Ranked Measure Data")){
     if( sheetname %in% excel_sheets(f)){
-      message(f,sheetname)
+      catln(fn,f,sheetname)
       h=as.data.frame(read_excel(f,sheetname ,n_max = 2,col_names = F))
       row1=h[1,]
       row2=h[2,]
@@ -82,7 +84,7 @@ for(f in filenames){
       d=purgeUselessColumns(d)
       d=purgeUselessColumn(d,'\\.num')
       d=shortenNames(d)
-      #View(d)
+      write.csv(d,paste0('/practicum2/data/county/',fn,sheetname,'.csv'))
     }
   }
 }
