@@ -4,11 +4,11 @@
 #' date: "2017"
 #' ---
 #'
-#' NOTE: This file is very rough draft and needs to be cleaned up.
+#' This processes and scrubs the files
 #'
 #'# Load libraries
 #'
-
+rm(list = ls(all = TRUE)) #clear memory
 
 library(stringr)
 
@@ -94,7 +94,7 @@ loadData=function(f,fn,sheetname) {
     d=as.data.frame(read_excel(f,sheetname ,skip = 2,col_names = F))
     names(d)=header
     d=purgeUselessColumns(d)
-    d=purgeUselessColumn(d,'\\.num')
+    #d=purgeUselessColumn(d,'\\.num')
     d=purgeUselessColumnIfText(d,'ratio$')
     d=shortenNames(d)
     d$Year=as.numeric(fn)
@@ -106,6 +106,7 @@ loadData=function(f,fn,sheetname) {
 
 # bigdata=data.frame()
 for(f in filenames){# f=filenames[2]
+  message(f)
   fn=str_match(f, '/(\\d+)')[,2]
   sheet1=loadData(f,fn,"Ranked Measure Data")
   sheet2=loadData(f,fn,"Additional Measure Data")

@@ -27,11 +27,11 @@ for(f in Sys.glob('/practicum2/data/irs/1*.csv')){
   dt=read.csv(f,stringsAsFactors = F,colClasses = 'character')
   d$COUNTYFIPS=dt$COUNTYFIPS ##repair
   d$STATEFIPS=dt$STATEFIPS ##repair
+  d$fips=paste0(d$STATEFIPS,d$COUNTYFIPS)
   rm(dt)
   str(d)
-  d2=d[,c("STATEFIPS"       ,          "STATE"  ,                   "COUNTYFIPS",               
-          "COUNTYNAME"       )]
-  d2$year=fn
+  d2=d[,c("STATE"  ,  "COUNTYNAME"  ,'fips'     )]
+  d2$Year=fn
   d2$num.returns=d$N1
   d2$married.pct=d$MARS2/d$N1
   d2$dependents.ratio=d$NUMDEP/d$N1
@@ -44,8 +44,8 @@ for(f in Sys.glob('/practicum2/data/irs/1*.csv')){
   d2$realestate.ratio=d$N18500/d$N1  #indicator of ownership
   d2$mortgage.ratio=d$N19300/d$N1 #indicator of ownership
   d2$contributions.ratio=d$A19700/d$N1 #indicator of giving?
-  d2$taxcredits.ratio = d$N07100
-  write.csv(d2,paste0("/practicum2/data/irsclean/",fn,"-irs-soi.csv"))
+  d2$taxcredits.ratio = d$N07100/d$N1
+  write.csv(d2,paste0("/practicum2/data/irsclean/",fn,"-irs-soi.csv"),row.names = F)
   #summary(d2) 
   #describe(d2)
 }
@@ -81,7 +81,7 @@ library(choroplethrMaps)
 #'
 
 for(n in names(d2[,-1*(1:5)])){
-  print(county_choropleth(title=paste0('  ',n),data.frame(region=as.numeric(paste0(d2$STATEFIPS,d2$COUNTYFIPS)),
+  print(county_choropleth(title=paste0('  ',n),data.frame(region=as.numeric(d2$fips),
                                              value=d2[[n]])))
 }
 

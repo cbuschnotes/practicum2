@@ -9,7 +9,7 @@
 #'
 #'# Load libraries
 #'
-
+rm(list = ls(all = TRUE)) #clear memory
 library(stringr)
 library(psych)
 setwd("/practicum2")
@@ -41,30 +41,50 @@ for(f in Sys.glob('/practicum2/data/wonder/2*.txt')){
   d=read.csv(f,stringsAsFactors = F,sep="\t",na.strings = c('','Not Applicable'))
   dt=read.csv(f,stringsAsFactors = F,colClasses = 'character',sep="\t",na.strings = c('','Not Applicable'))
   d$Year=fn
-  d$County.Code=dt$County.Code ##repair
+  d$County.Code=NULL
+  d$fips=dt$County.Code ##repair
   d$Age.Group=NULL
   d$Notes=NULL
   d$Unreliable=as.numeric(regexpr("Unreliable",d$Crude.Rate)>0)
   d$Crude.Rate=as.numeric(gsub("\\s*\\(Unreliable\\)","",d$Crude.Rate))
   d$X..of.Total.Deaths=NULL
   d$Age.Grouping=condensedGroups[d$Age.Group.Code]
+  
+  sum(is.na(d$Age.Grouping))
+  sum(is.na(d$Age.Group.Code))
+  
   catln(f,"Incomplete cases:",sum(!complete.cases(d)))
   d=d[complete.cases(d),]
   names(d)
-  d %>% group_by(Year,County.Code,Age.Grouping) %>%
+  d %>% group_by(Year,fips,Age.Grouping) %>%
     summarise(
-      Unreliable=mean(Unreliable),
+      Unreliable=sum(Unreliable*Population)/sum(Population),
       County=min(County),
       Deaths=sum(Deaths),
       Population=sum(Population)) %>% 
     mutate(Death.per.100k=Deaths/Population*100000) %>% as.data.frame -> d
+  d4=expand.grid(fips=unique(d$fips),Age.Grouping=unique(d$Age.Grouping),Year=unique(d$Year))
+  
+  d=merge(d4,d,all=T)
+  # d$Unreliable[is.na(d$Deaths)]=1
+  # d$Deaths[is.na(d$Deaths)]=0
+  # d$Death.per.100k[is.na(d$Death.per.100k)]=0
+  # DO NOT NEED TO IMPUTE THIS, COUNTY HAS THE MISSING POPULATIONS
+  # d4=merge(d[d$Age.Grouping=='YOUTH',],d[d$Age.Grouping=='SENIOR',],by = 'fips',all = T,
+  #          suffixes = c(".youth",".senior"))
+  # d4=merge(d4,d[d$Age.Grouping=='ADULT',],by = 'fips',all = T,
+  #          suffixes = c("",".adult"))
+  # d4=d4[,qw('Population.adult Population.youth Population.senior')]
+  # d4=d4[complete.cases(d4),]
+  # imputeYouthPop=
+  #View(d4)
   alld=rbind(alld,d)
   #Crude Rate = Count / Population * 100,000
   summary(d)
   print(table(d$Age.Grouping))
   rm(dt)
   describe(d)
-  write.csv(d,paste0("/practicum2/data/wonderclean/",fn,"cdc.csv"))
+  write.csv(d,paste0("/practicum2/data/wonderclean/",fn,"cdc.csv"),row.names = F)
 }
 
 d=alld
@@ -86,7 +106,24 @@ for(n in unique(d$Age.Grouping)){
     d=d[d$Age.Grouping==n,]
     m=sum(d$Deaths)/sum(d$Population)
     print(sum(d$Deaths)/sum(d$Population))
-    plot((d$Population),d$Death.per.100k,col=rgb(1*d$Unreliable,0,0,0.2),log="x",main=n);grid()
+    plot((d$Population),d$Death.per.100k,col=rgb(1*d$Unreliable,0,1-d$Unreliable,0.2),log="x",main=n);grid()
+    abline(lm(Death.per.100k~I(Population),d),col='pink')
+    # points((d$Population),(d$Deaths+500*m)/(d$Population+500)*100000,col=rgb(1*d$Unreliable,0,1,1),
+    #        pch='.')
+  })
+}
+
+hist(d$Unreliable)
+
+for(n in unique(d$Age.Grouping)){
+  ##perhaps smooth the data to reduce leverage or just let winsor handle it?
+  ##or weight the training by ceiling(log(population size))
+  local({
+    d=d[d$Age.Grouping==n & d$Unreliable<10.1,]
+    m=sum(d$Deaths)/sum(d$Population)
+    print(sum(d$Deaths)/sum(d$Population))
+    plot(1/(d$Population),d$Death.per.100k,col=rgb(1*d$Unreliable,0,1-d$Unreliable,0.2),main=n);grid()
+    abline(lm(Death.per.100k~I(1/Population),d),col='pink')
     # points((d$Population),(d$Deaths+500*m)/(d$Population+500)*100000,col=rgb(1*d$Unreliable,0,1,1),
     #        pch='.')
   })
@@ -113,7 +150,7 @@ moments::skewness(apply(keepNumeric(d),2,asinh))
 
 require(ggplot2)
 ggplot(d)+
-  geom_histogram(aes(Death.per.100k))
+  geom_density(aes(Death.per.100k))+facet_wrap(~Age.Grouping)
 
 
 
@@ -130,7 +167,7 @@ for(ag in unique(d$Age.Grouping)){
   for(n in names(d)){
     if(is.numeric(d[[n]])){
       user.df= d %>% 
-        mutate(region=as.numeric(County.Code)) %>% rename_('value'=n) %>% 
+        mutate(region=as.numeric(fips)) %>% rename_('value'=n) %>% 
         group_by_('region')  %>% summarise(value=mean(value)) 
       names(user.df)
       print(county_choropleth(title=paste('  ',n,ag),user.df))
