@@ -97,23 +97,64 @@ summary(d)
 
 plot(density(log(d$Population)))
 
+require(binom)
+binom.confint(1,1000,methods = "exact")$lower
 
+a100k=100000
 
 for(n in unique(d$Age.Grouping)){
   ##perhaps smooth the data to reduce leverage or just let winsor handle it?
   ##or weight the training by ceiling(log(population size))
   local({
     d=d[d$Age.Grouping==n,]
+    d=d[!is.na(d$Deaths) & !is.na(d$Population),]
+    Unreliable=d$Unreliable
+    Unreliable[is.na(Unreliable)]=1
     m=sum(d$Deaths)/sum(d$Population)
-    print(sum(d$Deaths)/sum(d$Population))
-    plot((d$Population),d$Death.per.100k,col=rgb(1*d$Unreliable,0,1-d$Unreliable,0.2),log="x",main=n);grid()
-    abline(lm(Death.per.100k~I(Population),d),col='pink')
+    priori=sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T)
+    prioriweight=1/priori * 2
+    print(sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T))
+    plot((d$Population),d$Death.per.100k,col=rgb(1*Unreliable,0,1-Unreliable,0.2),log="x",main=n);grid()
+    #abline(lm(Death.per.100k~I(Population),d),col='pink')
+    points(d$Population, binom.confint(d$Deaths,d$Population,methods = "exact")$lower*a100k,col='pink',pch='.')
+    points(d$Population, 
+           (d$Deaths+prioriweight*priori)/(d$Population+prioriweight)*a100k,
+           col='purple',pch='.')
+    plot(d$Population, 
+         (d$Deaths+prioriweight*priori)/(d$Population+prioriweight)*a100k,
+         col='purple',log='x',main='priori corrected')
+    plot(d$Population, (d$Deaths)/(d$Population),
+         col=rgb(1,0,0,0.2),log='x',main=paste('Deaths/Population for ',n))
+    abline(v=10*1/priori,col='gray');grid()
+    abline(v=20*1/priori,col='gray');
+    text(10*1/priori,0.005,round(10*1/priori))
+    ##
+    plot(density(d$Population),main=n)
+    plot(d$Population, 
+         d$Deaths,pch='.',
+         col=rgb(1,0,0,0.1),main=n,log='xy');grid()
+    abline(lm(Deaths~Population,d))
+    abline(v=10*1/priori,col='gray');grid()
+    abline(v=2*10*1/priori,col='gray');grid()
+    text(10*1/priori,800,round(10*1/priori))
+    #pie(c(small=sum(d$Population<round(10*1/priori)),large=sum(d$Population>=round(10*1/priori))),main=n)
+       
+    print(summary(d$Deaths))
+    catln(n,'need at least a pop of this size',min(d$Deaths)*1/priori," small counties ",
+          sum(d$Population<round(10*1/priori))," big counties ",sum(d$Population>=round(10*1/priori) ))
     # points((d$Population),(d$Deaths+500*m)/(d$Population+500)*100000,col=rgb(1*d$Unreliable,0,1,1),
     #        pch='.')
   })
 }
-
+summary(d$Deaths)
 hist(d$Unreliable)
+
+plot(d$Population, 
+     d$Deaths,pch='.',
+     col=rgb(as.numeric(d$Age.Grouping=='SENIOR'),as.numeric(d$Age.Grouping=='ADULT'),
+             as.numeric(d$Age.Grouping=='YOUTH'),0.5),
+#     ylim=c(1,50000),
+     main='Senior, Adult, Minor deaths by population',log='xy');grid()
 
 for(n in unique(d$Age.Grouping)){
   ##perhaps smooth the data to reduce leverage or just let winsor handle it?
@@ -149,7 +190,7 @@ moments::skewness(winsor(keepNumeric(d)))
 moments::skewness(apply(keepNumeric(d),2,asinh))
 
 require(ggplot2)
-ggplot(d)+
+ggplot(winsor1Df(d))+
   geom_density(aes(Death.per.100k))+facet_wrap(~Age.Grouping)
 
 
