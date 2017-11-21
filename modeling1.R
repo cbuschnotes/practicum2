@@ -12,26 +12,34 @@
 rm(list = ls(all = TRUE)) #clear memory
 library(stringr)
 
-setwd("/practicum2")
+setwd("~/../practicum2")
 source("common.R")
 
-filenames=c(Sys.glob('/practicum2/data/county/2015*.csv'),
-            Sys.glob('/practicum2/data/irsclean/2015*.csv'),
-            Sys.glob('/practicum2/data/wonderclean/2015*.csv'))
 
 bigdata=NULL
-for(f in filenames){# f=filenames[2]
-  message(f)
-  fn=str_match(f, '/(\\d+)')[,2]
-  d=read.csv(f)
-  
-  if(!is.null(bigdata)){
-    bigdata=(merge(bigdata,d))
-  }else{
-    bigdata=d
+for(year in 2010:2015){
+  filenames=c(Sys.glob(paste0('/practicum2/data/county/',year,'*.csv')),
+              Sys.glob(paste0('/practicum2/data/irsclean/',year,'*.csv')),
+              Sys.glob(paste0('/practicum2/data/wonderclean/',year,'*.csv')))
+  yeardata=NULL
+  for(f in filenames){# f=filenames[2]
+    ##gotta go by year
+    message(year,' ',f)
+    fn=str_match(f, '/(\\d+)')[,2]
+    d=read.csv(f)
+    
+    if(!is.null(yeardata)){
+      yeardata=(merge(yeardata,d))
+    }else{
+      yeardata=d
+    }
   }
-  # bigdata=dplyr::bind_rows(bigdata,sheet1)
+  bigdata=dplyr::bind_rows(yeardata,bigdata)
 }
+d=bigdata
+
+summary(bigdata)
+
 d=bigdata
 
 #########################################################
@@ -187,7 +195,7 @@ plot(density(winsor1(asinh(d$Death.per.100k)),na.rm = T))
 #d=addLadders(d,yvar=yvar,ignore = ignore)
 plot(d$Population_nrP,d$Death.per.100k)
 
-d=impute(d,ignore = ignore)
+d=impute(d,ignore = ignore,missing.threshold = 0.25)
 
 plot(d$Deaths,d$Death.per.100k,log='xy')
 plot(d$Deaths,d$Death.per.100k/100000*d$Population,log='xy')
@@ -201,28 +209,32 @@ v=ezvif(df = keepNumeric(d[complete.cases(d),]),yvar = yvar,folds = 5)
 v
 require(MASS)
 m=lm(ezformula(v),d)
-m=lm(ezformula(c(yvar,predictorVars)),d,weights = d$Population)
-summary(m)
-m=stepAIC(m)
-summary(m)
-coef.beta.lm.as.df(m)
-fit1=predict(m,d)
-plot(d$Death.per.100k,fit1) #,xlim=c(0,1),ylim=c(0,1))
-grid()
+
+predictorVars=intersect(names(d),predictorVars)
+
+# m=lm(ezformula(c(yvar,predictorVars)),d,weights = d$Population)
+# summary(m)
+# m=stepAIC(m)
+# summary(m)
+# coef.beta.lm.as.df(m)
+# fit1=predict(m,d)
+# plot(d$Death.per.100k,fit1) #,xlim=c(0,1),ylim=c(0,1))
+# grid()
 
 require(rpart)
 require(rpart.plot)
 summary(d$Population)
 mtree=rpart(ezformula(c(yvar,predictorVars)),d,weights = d$Population,control = rpart.control(cp = 0.004))
+mtree=rpart(ezformula(c(yvar,grep('insured',predictorVars,value=T))),d,weights = d$Population,control = rpart.control(cp = 0.04))
 prp(mtree,varlen=55,cex=1)
 plot(d$Death.per.100k,predict(mtree));grid()
 
 #plot(d$uninsured.pct,d$uninsured_adults.pct);grid()
 #hist(d$uninsured.pct-d$uninsured_adults.pct)
 
-d$successes=d$Population-d$Deaths
-d$failures=d$Deaths
-m=glm(ezformula(c('cbind(failures,successes)',predictorVars)),d,family = binomial)
+m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',predictorVars)),d,family = binomial)
+m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',grep('insured',predictorVars,value=T))),
+      d,family = binomial)
 summary(m)
 m=stepAIC(m)
 summary(m)
@@ -235,6 +247,6 @@ length(d$Death.per.100k)
 plot(d$Death.per.100k/100000,fit2) #,xlim=c(0,1),ylim=c(0,1))
 grid()
 
-
+#names(d)[order(nchar(names(d)))]
 
 d$primary_care_physicians.pcp_rate

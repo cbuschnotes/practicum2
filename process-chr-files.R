@@ -12,7 +12,9 @@ rm(list = ls(all = TRUE)) #clear memory
 
 library(stringr)
 
-setwd("/practicum2")
+cwd()
+
+setwd("~/../practicum2")
 source("common.R")
 
 scrubnames=function(h2){
@@ -64,13 +66,14 @@ shortenNames=function(d){
   h2=strsplit(h,'([_])',perl=T)
   for(i in 1:length(h2)){ #i=7; h2[i]
     names(d)[i]=sub('\\.$','',gsub('_*\\._*','.',paste0(unique(unlist(h2[i])),collapse = '_'),perl=T,fixed = F))
+    names(d)[i]=sub('data_for_measures_with_an_asterisk_should_not_be_compared_prior_years_due_to_changes_in_definition.','',names(d)[i])
   }
   d
 }
 
 
 
-filenames=Sys.glob('/practicum2/data/county/xls/*.xls')
+filenames=Sys.glob('data/county/xls/*.xls')
 
 require(readxl)
 for(f in filenames){ 
@@ -98,7 +101,7 @@ loadData=function(f,fn,sheetname) {
     d=purgeUselessColumnIfText(d,'ratio$')
     d=shortenNames(d)
     d$Year=as.numeric(fn)
-    write.csv(d,paste0('/practicum2/data/county/',fn,sheetname,'.csv'),row.names = F)
+    write.csv(d,paste0('data/county/',fn,sheetname,'.csv'),row.names = F)
     return(d)
   }
   NULL

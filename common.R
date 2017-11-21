@@ -3393,9 +3393,10 @@ read.clip=function(fn="clipboard",header=T,na.strings = c("NULL","NA"),read.last
 
 
 rename.columns=function(df,changelist){
-  #renames columns of a dataframe
+  #renames columns of a dataframe via list(oldname=newname)
   for(i in 1:length(names(df))){
     if(length(changelist[[names(df)[i]]])>0){
+      message(names(df)[i]," renamed columns to ",changelist[[names(df)[i]]])
       names(df)[i]= changelist[[names(df)[i]]]
     }
   }
