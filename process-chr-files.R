@@ -19,6 +19,7 @@ source("common.R")
 
 scrubnames=function(h2){
   h2[is.na(h2)]=''
+  h2=sub('% Households with high housing costs','Households with high housing costs',h2,fixed = T)
   h2=tolower(gsub('_+','_',gsub('[-]','_',gsub('\\s+','_',gsub('\\#','num',gsub('\\%','pct',h2))))))
   h2=gsub('<','lt',h2,fixed = T)
   h2=gsub('>','gt',h2,fixed=T)

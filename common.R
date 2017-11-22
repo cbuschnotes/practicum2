@@ -286,8 +286,8 @@ trimLeftGapZ=function(xvar,df,zscore=1){
 rsqWrong=function(actual,pred){ 
   return (sum((pred-mean(actual))^2)/sum((actual-mean(actual))^2)); 
 }
-rmse=function(x,y,k=0){
-  return( sqrt(sum((x-y)^2)/(length(x)-k)));
+rmse=function(x,y,k=0,weights=rep(1,length(x))){
+  return( sqrt(sum((x-y)^2*weights)/(sum(weights)-k)));
 }
 
 mad.error=function(x,y,k=0){
@@ -3690,3 +3690,5 @@ darken <- function(color, factor=1.4){ #darkens colors
 normalize=function(x) {
   (x-min(x,na.rm = T))/(max(x,na.rm = T)-min(x,na.rm = T))
 }
+
+shush=function(...) invisible(capture.output(suppressMessages(suppressPackageStartupMessages(suppressWarnings(...)))))

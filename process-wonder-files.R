@@ -12,7 +12,7 @@
 rm(list = ls(all = TRUE)) #clear memory
 library(stringr)
 library(psych)
-setwd("/practicum2")
+setwd("../practicum2")
 source("common.R")
 require(dplyr)
 #'
@@ -35,7 +35,7 @@ condensedGroups=c("1"='YOUTH',
                   "65-74"='SENIOR',
                   "75-84"='SENIOR', "85+"='SENIOR')
 alld=NULL
-for(f in Sys.glob('/practicum2/data/wonder/2*.txt')){
+for(f in Sys.glob('data/wonder/2*.txt')){
   message('processing ',f)
   fn=as.numeric(str_match(f, '\\/(\\d+)')[,2])
   d=read.csv(f,stringsAsFactors = F,sep="\t",na.strings = c('','Not Applicable'))
@@ -63,9 +63,10 @@ for(f in Sys.glob('/practicum2/data/wonder/2*.txt')){
       Deaths=sum(Deaths),
       Population=sum(Population)) %>% 
     mutate(Death.per.100k=Deaths/Population*100000) %>% as.data.frame -> d
-  d4=expand.grid(fips=unique(d$fips),Age.Grouping=unique(d$Age.Grouping),Year=unique(d$Year))
-  
-  d=merge(d4,d,all=T)
+  ###fill in NAs for missing counties
+  # d4=expand.grid(fips=unique(d$fips),Age.Grouping=unique(d$Age.Grouping),Year=unique(d$Year))
+  # d=merge(d4,d,all=T)
+  #######
   # d$Unreliable[is.na(d$Deaths)]=1
   # d$Deaths[is.na(d$Deaths)]=0
   # d$Death.per.100k[is.na(d$Death.per.100k)]=0
@@ -84,12 +85,12 @@ for(f in Sys.glob('/practicum2/data/wonder/2*.txt')){
   print(table(d$Age.Grouping))
   rm(dt)
   describe(d)
-  write.csv(d,paste0("/practicum2/data/wonderclean/",fn,"cdc.csv"),row.names = F)
+  write.csv(d,paste0("data/wonderclean/",fn,"cdc.csv"),row.names = F)
 }
 
 d=alld
 sort(unique(d$Age.Grouping))
-pie(table(sort(d$Age.Grouping)),main='Counties with >1 mortality')
+pie(table(sort(d$Age.Grouping)),main='Counties with >=10 mortality')
 
 
 #' Noticed a lot of skew
