@@ -287,25 +287,20 @@ if(F) {
   year=0
   age='ADULT'
   coefreport=data.frame(names='x',age='x')
-  for(age in unique(bigdata$Age.Grouping)){
+  for(age in c('ADULT','YOUTH')){
     agereport=data.frame(names='x',age='x')
-    for(year in c(0,unique(bigdata$Year))) {
+    for(year in 0) {
       d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k) & (bigdata$Year==year | year==0),] 
+      shush({
       d=winsor1Df(d,ignore = ignore)
       d=impute(d,ignore = ignore,missing.threshold = 0.25)
+      })
       label=paste(age,ifelse(year==0,'',year))
       predictorVars=intersect(names(d),predictorVarsRaw)
-      d=d[complete.cases(d[,c('Deaths','Population',grep('insured',predictorVars,value=T))]),]
-      if(age=='YOUTH'){
-        if(all(is.na(d[['uninsured_children.pct']]))) next;
-        m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',grep('uninsured_children.pct',predictorVars,value=T))),
-              d,family = 'binomial')   
-      }else{
-        d$uninsured_children.pct=NULL
-        m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',base::intersect(names(d),grep('insured',predictorVars,value=T)))),
+      d=d[complete.cases(d[,c('Deaths','Population',grep('sahie',predictorVars,value=T))]),]
+      m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',base::intersect(names(d),grep('sahie',predictorVars,value=T)))),
               d,family = 'binomial')  
-      }
-      
+
       m=stepAIC(m,trace=F)
       cdf=coef.beta.logistic.as.df(m)
       m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',row.names(cdf)[1])),
@@ -328,7 +323,7 @@ if(F) {
       length(d$Death.per.100k)
       plot(d$Deaths,fit2*d$Population,col=rgb(0,0,0,0.2),main=label) #,xlim=c(0,1),ylim=c(0,1))
       grid()
-      tdf=data.frame(uninsured_adults.pct=0:100, uninsured.pct=0:100,uninsured_children.pct=0:100)
+      tdf=data.frame(sahie.pct.uninsured=0:100,uninsured_adults.pct=0:100, uninsured.pct=0:100,uninsured_children.pct=0:100)
       plot(0:100,predict(m,tdf,type='response')*100000,col=rgb(0,0,0,0.2),main=label,
            ylab='Death per 100k',xlab=names(coef(m))[2]) #,xlim=c(0,1),ylim=c(0,1))
       

@@ -15,6 +15,31 @@ library(psych)
 setwd("../practicum2")
 source("common.R")
 require(dplyr)
+
+#'
+#'# Process SAHIE files
+#'
+
+allSahie=NULL
+for(f in Sys.glob('data/sahie/*.csv')){
+  message('processing ',f)
+  fn=as.numeric(str_match(f, '(\\d+)')[,2])
+  d=read.csv(f,stringsAsFactors = F,sep=",",na.strings = c('','Not Applicable',"   . "),skip=79,
+             colClasses = 'character')
+  d=d[d$geocat==50 & d$agecat %in% c(4,1) & d$racecat==0 & d$sexcat==0 & d$iprcat==0,
+      qw('year agecat statefips countyfips PCTUI')]
+  names(d)[1]='Year'
+  d$fips=paste0(d$statefips,d$countyfips)
+  d$statefips=NULL
+  d$countyfips=NULL
+  d$Age.Grouping=ifelse(d$agecat==4,'YOUTH',ifelse(d$agecat==5,'ADULT',ifelse(d$agecat==1,'ADULT',NA)))
+  d$agecat=NULL
+  d$sahie.pct.uninsured=as.numeric(d$PCTUI)
+  d$PCTUI=NULL
+  allSahie=rbind(allSahie,d)
+}
+rm(d)
+
 #'
 #'# Process IRS data files
 #'
@@ -63,6 +88,7 @@ for(f in Sys.glob('data/wonder/2*.txt')){
       Deaths=sum(Deaths),
       Population=sum(Population)) %>% 
     mutate(Death.per.100k=Deaths/Population*100000) %>% as.data.frame -> d
+  d=merge(d,allSahie,by=qw('fips Age.Grouping Year'),all.x = T)
   ###fill in NAs for missing counties
   # d4=expand.grid(fips=unique(d$fips),Age.Grouping=unique(d$Age.Grouping),Year=unique(d$Year))
   # d=merge(d4,d,all=T)
@@ -95,6 +121,9 @@ pie(table(sort(d$Age.Grouping)),main='Counties with >=10 mortality')
 
 #' Noticed a lot of skew
 summary(d)
+summary(d[d$Age.Grouping=='SENIOR',])
+summary(d[d$Age.Grouping=='YOUTH',])
+summary(d[d$Age.Grouping=='ADULT',])
 
 plot(density(log(d$Population)))
 
