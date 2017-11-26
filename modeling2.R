@@ -87,6 +87,24 @@ for(n in names(bigdata)){
 
 fullness()
 
+##WHERE DO WE HAVE DATA?
+
+require(usmap)
+plot_usmap(regions = 'counties',data=bigdata[bigdata$Age.Grouping=='YOUTH',c('fips','Deaths')],
+           value='Deaths',lines=NA)+
+  scale_fill_continuous(low="green", high="darkred", 
+                        guide="colorbar",na.value="lightgray",name = "Youth Deaths")+
+  theme(legend.position="top")
+plot_usmap(regions = 'counties',data=bigdata[bigdata$Age.Grouping=='SENIOR',c('fips','Deaths')],
+           value='Deaths',lines=NA)+
+  scale_fill_continuous(low="green", high="darkred", 
+                        guide="colorbar",na.value="lightgray",name = "SENIOR Deaths")+
+  theme(legend.position="top")
+plot_usmap(regions = 'counties',data=bigdata[bigdata$Age.Grouping=='ADULT',c('fips','Deaths')],
+           value='Deaths',lines=NA)+
+  scale_fill_continuous(low="green", high="darkred", 
+                        guide="colorbar",na.value="lightgray",name = "ADULT Deaths")+
+  theme(legend.position="top")
 
 ##first model all years data
 
@@ -112,67 +130,16 @@ discardVars=c(ignore)
 predictorVarsRaw=unique(predictors$column[predictors$predictor==1 & predictors$column!=yvar])
 
 
-#+ clustering
-
-if(F) { #clustering
-  #####################
-  #'
-  #' Lantz (2015) suggests the elbow method for cluster size determination.
-  #'
-  #' Compute and plot wss for k = 1 to k = 17:
-  #'
-  #'
-  require(factoextra)
-  require(cluster)
-  data=bigdata[!is.na(bigdata$Death.per.100k) & bigdata$Age.Grouping=='YOUTH',]
-  data=impute(data,missing.threshold = 0.1)
-  data=as.data.frame(scale(keepNumeric( data)))
-  
-  set.seed(7)
-  k.max <- 17 # Maximal number of clusters
-  wss <- sapply(1:k.max, function(k){set.seed(17); kmeans(data, k, nstart=5 )$tot.withinss})
-  plot(1:k.max, wss, type="b", pch = 19, frame = FALSE,    xlab="Number of clusters K",
-       ylab="Total within-clusters sum of squares",main='elbow method');grid()
-  
-  
-  cl=clara(data, 5, metric = "manhattan",
-           correct.d=TRUE)
-  fviz_cluster(cl, stand = FALSE, geom = "point",
-               pointsize = 1)
-  for(i in unique(cl$clustering)){
-    #  print(summary(bigdata$Deaths[cl$clustering==i]))
-    #  print(summary(bigdata$Death.per.100k[cl$clustering==i]))
-    catln(i,'deathRate per 100k',sum(1.0*bigdata$Deaths[cl$clustering==i])/
-            sum(1.0*bigdata$Population[cl$clustering==i])*100000,
-          'counties=',(sum(cl$clustering==i)))
-  }
-  
-  
-  
-  
-  
-  #' The above suggests 5.
-  #'
-  
-  
-  # set.seed(7)
-  # trainindex=sample(1:nrow(bigdata),100) %>% (1:nrow(bigdata))
-  # distance=dist(bigdata[trainindex,predictorVars],method='manhattan')
-  # hc=hclust(distance,"ward.D2")
-  # plot(hc,labels=paste(round(bigdata$Death.per.100k[trainindex]),'!'))
-  # rect.hclust(hc,k=3,border="blue")
-  
-  ######################
-}
 
 #+ trees
 
 #+ fig.width=10, fig.height=10
 
 # length(unique(bigdata$access_to_healthy_foods.pct.y))
-age='YOUTH'
+age='SENIOR'
 year=0
 importance=data.frame()
+trees=list()
 for(age in unique(bigdata$Age.Grouping)){
   for(year in 0) { #c(0,unique(bigdata$Year))) {
     shush({
@@ -206,13 +173,19 @@ for(age in unique(bigdata$Age.Grouping)){
     }) #end of shush output
       # mtree=rpart(ezformula(c(yvar,grep('insured',predictorVars,value=T))),d,weights = d$Population,control = rpart.control(cp = 0.01))
       # prp(mtree,varlen=55,cex=0.8,nn=T,main=paste(label,'insurance'))
+    if(age=='SENIOR'){
+      mtree=rpart(ezformula(c(yvar,grep('insured',predictorVars,invert = T,value = T))),
+                  d,weights = d$Population,
+                  control = rpart.control(minsplit= 2000,cp = 0.0)) 
+    }else{
       mtree=rpart(ezformula(c(yvar,predictorVars)),d,weights = d$Population,control = rpart.control(minsplit=if(age=='YOUTH') {20}else{ 2000},cp = 0.0))
-      printcp(mtree) # display the results 
-      plotcp(mtree,main=label) # visualize cross-validation results 
-      cp=mtree$cptable[which.min(mtree$cptable[,"xerror"]),"CP"] ##best CP
-      message(label,'cp=',cp)
-      mtree=prune(mtree,cp)
-      prp(mtree,varlen=ceiling(max(nchar(names(mtree$variable.importance)))),cex=0.8,nn=F,main=label,box.palette="GnRd",fallen.leaves = F)
+    }
+    printcp(mtree) # display the results 
+    plotcp(mtree,main=label) # visualize cross-validation results 
+    cp=mtree$cptable[which.min(mtree$cptable[,"xerror"]),"CP"] ##best CP
+    message(label,'cp=',cp)
+    mtree=prune(mtree,cp)
+    prp(mtree,varlen=ceiling(max(nchar(names(mtree$variable.importance)))),cex=0.8,nn=F,main=label,box.palette="GnRd",fallen.leaves = F)
 
     message(label)
 
@@ -235,7 +208,7 @@ for(age in unique(bigdata$Age.Grouping)){
                                 cbind(data.frame(age=age,year=year),
                                       as.data.frame(t(as.data.frame(mtree$variable.importance)))))
   
-    
+  trees[[age]]=mtree;
     
     # rpart.plot(mtree,tweak=4,fallen.leaves = F,ycompress=T,extra=0)
     
@@ -272,6 +245,8 @@ for(age in unique(bigdata$Age.Grouping)){
     #hist(predict(mtree),main=label)
   }
 }  
+
+
 #importance
 #View(importance)
 ###################END OF TREE
@@ -292,22 +267,16 @@ if(F) {
     for(year in 0) {
       d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k) & (bigdata$Year==year | year==0),] 
       shush({
-      d=winsor1Df(d,ignore = ignore)
-      d=impute(d,ignore = ignore,missing.threshold = 0.25)
+        d=winsor1Df(d,ignore = ignore)
+        d=impute(d,ignore = ignore,missing.threshold = 0.25)
       })
       label=paste(age,ifelse(year==0,'',year))
       predictorVars=intersect(names(d),predictorVarsRaw)
-      d=d[complete.cases(d[,c('Deaths','Population',grep('sahie',predictorVars,value=T))]),]
-      m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',base::intersect(names(d),grep('sahie',predictorVars,value=T)))),
-              d,family = 'binomial')  
-
-      m=stepAIC(m,trace=F)
+      d=d[complete.cases(d[,c('Deaths','Population',predictorVars)]),]
+      m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',predictorVars)),d,family = 'binomial')
+      m=stepAIC(m,trace=T)
       cdf=coef.beta.logistic.as.df(m)
-      m=glm(ezformula(c('cbind(Deaths,I(Population-Deaths))',row.names(cdf)[1])),
-            d,family = 'binomial')
       summary(m)
-      
-      cdf=coef.beta.logistic.as.df(m)
       names(cdf)[1]=as.character(ifelse(year==0,'ALL',year))
       cdf$age=ifelse(age=='','ALL',age)
       cdf[[paste0('rSqr',year)]]=McFaddenR2(m)['adj.mr2']
@@ -344,3 +313,108 @@ if(F) {
 # plot(airct) 
 # dev.off()
 
+#+ clustering
+
+require(maps)
+data("county.fips")
+
+fips2statecounty=county.fips$polyname
+names(fips2statecounty)=as.character(county.fips$fips)
+
+
+#if(F) { #clustering
+#https://stackoverflow.com/questions/23714052/ggplot-mapping-us-counties-problems-with-visualization-shapes-in-r
+
+
+#####################
+#'
+#' Lantz (2015) suggests the elbow method for cluster size determination.
+#'
+#' Compute and plot wss for k = 1 to k = 17:
+#'
+#'
+require(factoextra)
+require(cluster)
+
+age='SENIOR'
+age='YOUTH'
+for(age in unique(bigdata$Age.Grouping)){
+  # row.names(bigdata[2,])
+  # data=bigdata[2,]
+  # row.names(data)
+  # data=bigdata[!is.na(bigdata$Death.per.100k) #& bigdata$Age.Grouping==age
+  #              ,
+  # 
+  data=as.data.frame(aggregate(bigdata[,names(trees[[age]]$variable.importance)],
+                               list(fips=bigdata$fips),FUN=function(x) mean(x,na.rm=T)))
+  fips=data$fips
+  data$fips=NULL
+  data=winsor1Df(data)
+  data=impute(data,missing.threshold = 0.1)
+  data=as.data.frame(scale(keepNumeric( data)))
+  set.seed(7)
+  k.max <- 17 # Maximal number of clusters
+  wss <- sapply(1:k.max, function(k){set.seed(17); kmeans(data, k, nstart=5 )$tot.withinss})
+  plot(1:k.max, wss, type="b", pch = 19, frame = FALSE,    xlab="Number of clusters K",
+       ylab="Total within-clusters sum of squares",main=paste(age,'elbow method'));grid()
+  bestK=3
+  #clara
+  cl=clara(data, bestK, metric = "manhattan",
+           correct.d=TRUE,samples=50)
+  print(fviz_cluster(cl, data=data,stand = FALSE, geom = "point",
+                     pointsize = 1))
+  #kmeans
+  cl=kmeans(data, bestK, nstart=5 )
+  print(fviz_cluster(cl, data=data,stand = FALSE, geom = "point",
+                     pointsize = 1))
+  cl$clustering=cl$cluster
+  ###
+  data$fips=fips
+  #map("county",fill=T,col='white',myborder=0,border=NA)
+  #map("county", fips2statecounty[names(fips2statecounty) %in% bigdata$fips[w]],
+  #    add=T,fill=T,col=1+i) 
+  
+  print(
+    plot_usmap(regions = 'counties',data=data.frame(fips=data$fips,cluster=LETTERS[cl$clustering]),
+               value='cluster',lines=NA)+
+      scale_color_gradient(low="green",high="darkgreen")+
+      #scale_colour_discrete(name = "Fancy Title")+
+      # scale_fill_continuous(low="green", high="darkred", 
+      #                       guide="colorbar",na.value="lightgray",name = "Youth cluster")+
+      theme(legend.position="bottom",legend.title=element_blank(),plot.title = element_text(hjust = 0.5)) +
+      ggtitle(age)
+  )
+  for(i in unique(cl$clustering)){
+    #  print(summary(bigdata$Deaths[cl$clustering==i]))
+    #  print(summary(bigdata$Death.per.100k[cl$clustering==i]))
+    w=impute.df$fips %in% data$fips[cl$clustering==i]
+    catln(age,LETTERS[i],'deathRate per 100k',sum(1.0*impute.df$Deaths[w])/
+            sum(1.0*impute.df$Population[w])*100000,
+          'counties=',length(unique(impute.df$fips[w])))
+    
+    
+    #map("county", 'minnesota,rice',add=T,fill=T,col='red') 
+    
+    #print(summary(bigdata[w,c('Deaths','Population',names(trees[[age]]$variable.importance))]))
+  }
+  
+  
+  
+  # legend("bottomleft",legend = 1:5,pch=20,col=2:6,horiz=T)
+  # library(dplyr)
+  # library(choroplethrMaps)
+  # library(choroplethr)
+  # require(maps)
+  
+  
+  
+  
+  # set.seed(7)
+  # trainindex=sample(1:nrow(bigdata),100) %>% (1:nrow(bigdata))
+  # distance=dist(bigdata[trainindex,predictorVars],method='manhattan')
+  # hc=hclust(distance,"ward.D2")
+  # plot(hc,labels=paste(round(bigdata$Death.per.100k[trainindex]),'!'))
+  # rect.hclust(hc,k=3,border="blue")
+  
+  ######################
+}
