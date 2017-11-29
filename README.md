@@ -98,8 +98,7 @@ The analytics escalator goes from hindsight to foresight, with that in
 mind the goal of this project is not to be purely predictive focused but
 rather prescriptive in nature.
 
-![](./img-readme/media/image1.png){width="3.9654811898512685in"
-height="3.5349037620297463in"}
+![](./img-readme/media/image1.png){width="3.9654811898512685in" height="3.5349037620297463in"}
 
 In this paper, the population being studied are those assigned to age
 groups. As a whole, the age groups population sizes are lognormal
