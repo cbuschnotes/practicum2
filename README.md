@@ -20,7 +20,7 @@ related to those causes of mortality. The individual clusters of
 counties show a stark difference in mortality rates.
 
 The conclusions of the study support the notion of increased community
-intervention and support the greater Health initiatives of the
+intervention and support the greater health initiatives of the
 Affordable Care Act such as Patient Navigators.
 
 Background
@@ -311,15 +311,8 @@ The youth fitted heat map fills in a lot of the missing data from the
 actual map. In the above map, metropolitan areas tend to have a more
 favorable environment.
 
-  **Measure**                       **SENIOR test set**   **ADULT test set**   **YOUTH test set**
-  --------------------------------- --------------------- -------------------- --------------------
-  tree Deaths RMSE                  109.1264              84.64957             42.4409
-  priori Deaths RMSE                236.7213              242.0419             76.01757
-  tree Deaths r-squared             0.9958717             0.9839259            0.9084195
-  priori Deaths r-squared           0.9857348             0.9433995            0.909443
-  fitted Death per 100k RMSE        1912.41               251.6016             464.2714
-  weighted Death per 100k RMSE      444.3723              78.71772             90.60464
-  fitted Death per 100k r-squared   0.03661804            0.5119184            0.3094672
+![](./img-readme/media/image20.png)
+
 
 Looking at the performance metrics, with respect to predicting the
 actual number of deaths, the trees perform quite well and reduce the
@@ -352,9 +345,9 @@ three clusters or determined to be optimal. However, it is admitted that
 there is a bit of subjectivity to the number of clusters. The dataset
 for clustering was standardized.
 
-![](./img-readme/media/image20.png)
 ![](./img-readme/media/image21.png)
 ![](./img-readme/media/image22.png)
+![](./img-readme/media/image23.png)
 
 
 \#\# SENIOR cluster= 1 deathRate per 100k: 867.6311 counties: 554\
@@ -367,9 +360,9 @@ One can see in the pattern, the metropolitan areas have a better
 environment for senior citizens with the beltway of America being one of
 the one of the worst.
 
-![](./img-readme/media/image23.png)
 ![](./img-readme/media/image24.png)
 ![](./img-readme/media/image25.png)
+![](./img-readme/media/image26.png)
 
 
 \#\# ADULT cluster= 1 deathRate per 100k: 1612.417 counties: 1285\
@@ -380,11 +373,11 @@ the one of the worst.
 The clustering identifies the high population metropolitan areas in
 addition to Colorado being a favorable environment for adult longevity.
 
-![](./img-readme/media/image26.png)
 ![](./img-readme/media/image27.png)
-
-
 ![](./img-readme/media/image28.png)
+
+
+![](./img-readme/media/image29.png)
 
 
 \#\# YOUTH cluster= 1 deathRate per 100k: 3473.614 counties: 433\
@@ -405,25 +398,25 @@ chart is to remember that the bar charts are by magnitude of standard
 deviation. Thus, a very tall bar represents an extreme value while a
 very low bar represents a very small value.
 
-![](./img-readme/media/image29.png)
-
-
 ![](./img-readme/media/image30.png)
 
 
 ![](./img-readme/media/image31.png)
 
 
-The following bar charts select only the top important fields. Thus, to
-make the charts far more readable.
-
 ![](./img-readme/media/image32.png)
 
+
+The following bar charts select only the top important fields. Thus, to
+make the charts far more readable.
 
 ![](./img-readme/media/image33.png)
 
 
 ![](./img-readme/media/image34.png)
+
+
+![](./img-readme/media/image35.png)
 
 
 The bar charts give greater insight into those geographic areas.
@@ -446,7 +439,7 @@ The adult age group is most susceptible to accidents. One might presume
 that the youth age group would be susceptible to accidents as well.
 However, to the contrary, much like the senior citizens, the youth age
 group shows problems of lack of exercise and poor diet. Michelle Obama
-emphasis on Obesity reduction through diet and exercise was very well
+emphasis on obesity reduction through diet and exercise was very well
 placed.
 
 With the adult age group showing a large sensitivity to motor vehicle
@@ -458,7 +451,7 @@ has yet to materialize.
 
 A lot of commonality exist in the regional clusters. Large metropolitan
 areas tend to have the best outcomes. Rural areas suffer from a lack of
-infrastructure. The deep South generally faces the most challenges.
+infrastructure. The deep south generally faces the most challenges.
 
 The author of this report gained a heightened awareness of the
 importance of exercise in addition to the usual New Year's resolutions
