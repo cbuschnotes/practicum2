@@ -89,22 +89,7 @@ for(f in Sys.glob('data/wonder/2*.txt')){
       Population=sum(Population)) %>% 
     mutate(Death.per.100k=Deaths/Population*100000) %>% as.data.frame -> d
   d=merge(d,allSahie,by=qw('fips Age.Grouping Year'),all.x = T)
-  ###fill in NAs for missing counties
-  # d4=expand.grid(fips=unique(d$fips),Age.Grouping=unique(d$Age.Grouping),Year=unique(d$Year))
-  # d=merge(d4,d,all=T)
-  #######
-  # d$Unreliable[is.na(d$Deaths)]=1
-  # d$Deaths[is.na(d$Deaths)]=0
-  # d$Death.per.100k[is.na(d$Death.per.100k)]=0
-  # DO NOT NEED TO IMPUTE THIS, COUNTY HAS THE MISSING POPULATIONS
-  # d4=merge(d[d$Age.Grouping=='YOUTH',],d[d$Age.Grouping=='SENIOR',],by = 'fips',all = T,
-  #          suffixes = c(".youth",".senior"))
-  # d4=merge(d4,d[d$Age.Grouping=='ADULT',],by = 'fips',all = T,
-  #          suffixes = c("",".adult"))
-  # d4=d4[,qw('Population.adult Population.youth Population.senior')]
-  # d4=d4[complete.cases(d4),]
-  # imputeYouthPop=
-  #View(d4)
+
   alld=rbind(alld,d)
   #Crude Rate = Count / Population * 100,000
   summary(d)
@@ -116,7 +101,17 @@ for(f in Sys.glob('data/wonder/2*.txt')){
 
 d=alld
 sort(unique(d$Age.Grouping))
-pie(table(sort(d$Age.Grouping)),main='Counties with >=10 mortality')
+barplot(table(d$fips,sort(d$Age.Grouping)),main='Counties with >=10 mortality',col=2:4)
+
+local({
+  .=round((apply(table(d$fips,sort(d$Age.Grouping)),2,FUN=function(x) sum(x>0))/3142)*100  )
+  b=barplot(.,col='lightblue')
+  text(b[,1],./2,paste(.,'%'))
+  title('Data Completeness by Age Group')
+  .
+})
+  
+
 
 
 #' Noticed a lot of skew
@@ -125,80 +120,109 @@ summary(d[d$Age.Grouping=='SENIOR',])
 summary(d[d$Age.Grouping=='YOUTH',])
 summary(d[d$Age.Grouping=='ADULT',])
 
-plot(density(log(d$Population)))
+plot(density(log(d$Population)),main='log(Age Group Populations) Density')
 
 require(binom)
-binom.confint(1,1000,methods = "exact")$lower
+
 
 a100k=100000
+n='ADULT'
 
 for(n in unique(d$Age.Grouping)){
   ##perhaps smooth the data to reduce leverage or just let winsor handle it?
   ##or weight the training by ceiling(log(population size))
-  local({
-    d=d[d$Age.Grouping==n,]
-    d=d[!is.na(d$Deaths) & !is.na(d$Population),]
-    Unreliable=d$Unreliable
-    Unreliable[is.na(Unreliable)]=1
-    m=sum(d$Deaths)/sum(d$Population)
-    priori=sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T)
-    prioriweight=1/priori * 2
-    print(sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T))
-    plot((d$Population),d$Death.per.100k,col=rgb(1*Unreliable,0,1-Unreliable,0.2),log="x",main=n);grid()
-    #abline(lm(Death.per.100k~I(Population),d),col='pink')
-    points(d$Population, binom.confint(d$Deaths,d$Population,methods = "exact")$lower*a100k,col='pink',pch='.')
-    points(d$Population, 
-           (d$Deaths+prioriweight*priori)/(d$Population+prioriweight)*a100k,
-           col='purple',pch='.')
-    plot(d$Population, 
-         (d$Deaths+prioriweight*priori)/(d$Population+prioriweight)*a100k,
-         col='purple',log='x',main='priori corrected')
-    plot(d$Population, (d$Deaths)/(d$Population),
-         col=rgb(1,0,0,0.2),log='x',main=paste('Deaths/Population for ',n))
-    abline(v=10*1/priori,col='gray');grid()
-    abline(v=20*1/priori,col='gray');
-    text(10*1/priori,0.005,round(10*1/priori))
-    ##
-    plot(density(d$Population),main=n)
-    plot(d$Population, 
-         d$Deaths,pch='.',
-         col=rgb(1,0,0,0.1),main=n,log='xy');grid()
-    abline(lm(Deaths~Population,d))
-    abline(v=10*1/priori,col='gray');grid()
-    abline(v=2*10*1/priori,col='gray');grid()
-    text(10*1/priori,800,round(10*1/priori))
-    #pie(c(small=sum(d$Population<round(10*1/priori)),large=sum(d$Population>=round(10*1/priori))),main=n)
-       
-    print(summary(d$Deaths))
-    catln(n,'need at least a pop of this size',min(d$Deaths)*1/priori," small counties ",
-          sum(d$Population<round(10*1/priori))," big counties ",sum(d$Population>=round(10*1/priori) ))
-    # points((d$Population),(d$Deaths+500*m)/(d$Population+500)*100000,col=rgb(1*d$Unreliable,0,1,1),
-    #        pch='.')
-  })
+  d=alld
+  d=d[d$Age.Grouping==n,]
+  d=d[!is.na(d$Deaths) & !is.na(d$Population),]
+  plot(density(log(d$Population)),main=paste(n,'log(Age Group Populations) Density'))
+  Unreliable=d$Unreliable
+  Unreliable[is.na(Unreliable)]=1
+  m=sum(d$Deaths)/sum(d$Population)
+  priori=sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T)
+  prioriweight=1/priori * 10
+  catln(n,priori,prioriweight)
+  priori=sum(d$Deaths[d$Population>prioriweight],na.rm = T)/sum(d$Population[d$Population>prioriweight],na.rm = T)
+  prioriweight=1/priori * 10
+  catln(n,priori,prioriweight)
+  
+  ##good
+  plot(d$Population, (d$Deaths)/(d$Population)*a100k,
+       col=rgb(1,0,0,0.2),log='x',main=paste('Deaths/Population for',n,'Group'),
+       xlab='Age Group Population in County',
+       ylab='Deaths/Population*100k in Age Group')
+  # points(d$Population,
+  #        (d$Deaths+10/2)/(d$Population+prioriweight/2), #*a100k,
+  #        col='purple',pch='.')
+  abline(v=10*1/priori,col='gray');
+  grid()
+  abline(h=quantile((d$Deaths)/(d$Population)*a100k,0.95),col='blue') #winsor
+  text(10*1/priori,max((d$Deaths)/(d$Population)*a100k)*0.05,round(prioriweight))
+  ##
+  # plot(d$Population, 
+  #      d$Deaths,pch=20,
+  #      col=rgb(1,0,0,0.1),main=n,log='xy',xlab='Age Group Population',ylab='Deaths in Age Group');grid()
+  # points(sort(d$Population),sort(d$Population)*priori,type='l')
+  # abline(v=prioriweight,col='gray');grid()
+  # text(prioriweight,800,round(10*1/priori))
+  ###
+  print(summary(d$Deaths))
+  catln(n,'priori',priori,
+        'prioriweight',prioriweight,
+        'need at least a pop of this size',min(d$Deaths)*1/priori,
+        " small counties ",      sum(d$Population<round(10*1/priori)),
+        " big counties ",sum(d$Population>=round(10*1/priori) ))
 }
 summary(d$Deaths)
-hist(d$Unreliable)
 
+###graph of overall by population
+d=alld
 plot(d$Population, 
      d$Deaths,pch='.',
      col=rgb(as.numeric(d$Age.Grouping=='SENIOR'),as.numeric(d$Age.Grouping=='ADULT'),
              as.numeric(d$Age.Grouping=='YOUTH'),0.5),
-#     ylim=c(1,50000),
-     main='Senior, Adult, Minor deaths by population',log='xy');grid()
-
+  xlab='Age Group Population in County',
+  ylab='Deaths in Age Group',
+     main='Senior, Adult, Youth Deaths',log='xy');grid() 
 for(n in unique(d$Age.Grouping)){
-  ##perhaps smooth the data to reduce leverage or just let winsor handle it?
-  ##or weight the training by ceiling(log(population size))
   local({
-    d=d[d$Age.Grouping==n & d$Unreliable<10.1,]
-    m=sum(d$Deaths)/sum(d$Population)
-    print(sum(d$Deaths)/sum(d$Population))
-    plot(1/(d$Population),d$Death.per.100k,col=rgb(1*d$Unreliable,0,1-d$Unreliable,0.2),main=n);grid()
-    abline(lm(Death.per.100k~I(1/Population),d),col='pink')
-    # points((d$Population),(d$Deaths+500*m)/(d$Population+500)*100000,col=rgb(1*d$Unreliable,0,1,1),
-    #        pch='.')
+    d=d[d$Age.Grouping==n,]
+    d=d[!is.na(d$Deaths) & !is.na(d$Population),]
+    priori=sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T)
+    prioriweight=1/priori * 10
+    points(sort(d$Population),sort(d$Population)*priori,type='l',col='black')
+    #abline(v=10*1/priori,col='gray');
+    text(10*1/priori,5,round(prioriweight))
   })
 }
+legend("topleft",legend = c('SENIOR','ADULT','YOUTH','Overall'),col=c('red','green','blue','black'),pch=c(20,20,20,NA),lty=c(NA,NA,NA,1))
+###done with graph of overall by population
+
+
+###graph of overall by population
+d=alld
+plot(d$Population, 
+     d$Deaths/d$Population*a100k,pch='.',
+     col=rgb(as.numeric(d$Age.Grouping=='SENIOR'),as.numeric(d$Age.Grouping=='ADULT'),
+             as.numeric(d$Age.Grouping=='YOUTH'),0.5),
+     xlab='Age Group Population in County',
+     ylab='Deaths per Capita in Age Group * 100k',
+     main='Senior, Adult, Youth Death Rates',log='xy');grid() 
+for(n in unique(d$Age.Grouping)){
+  local({
+    d=d[d$Age.Grouping==n,]
+    d=d[!is.na(d$Deaths) & !is.na(d$Population),]
+    priori=sum(d$Deaths,na.rm = T)/sum(d$Population,na.rm = T)
+    prioriweight=1/priori * 10
+    points(sort(d$Population),sort(d$Population)*priori/sort(d$Population)*a100k,type='l',col='black')
+    #abline(v=10*1/priori,col='gray');
+    text(1000000,priori*a100k*1.2,round(priori*a100k))
+  })
+}
+legend("bottomleft",legend = c('SENIOR','ADULT','YOUTH','Overall'),col=c('red','green','blue','black'),pch=c(20,20,20,NA),lty=c(NA,NA,NA,1))
+###done with graph of overall by population
+
+
+
 
 #death rates higher in rural ares
 #https://ruralhealth.und.edu/projects/health-reform-policy-research-center/pdf/mapping-rural-urban-mortality-differences-hhs-regions.pdf

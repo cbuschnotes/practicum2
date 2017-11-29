@@ -784,8 +784,16 @@ ezplot4=function(dfList,yvars=names(df),xvar='ROW',xlab=NULL,ylab='values',
   Sys.sleep(0) #frame();
 }
 ##
+# returns string w/o leading whitespace
+trim.leading <- function (x)  sub("^\\s+", "", x)
 
-qw = function(...){ x=c(...); x=gsub("\n"," ",x,fixed = T); unlist(strsplit(x, "[[:space:]]+"))}
+# returns string w/o trailing whitespace
+trim.trailing <- function (x) sub("\\s+$", "", x)
+
+# returns string w/o leading or trailing whitespace
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
+qw = function(...){ x=c(...); x=gdata::trim(gsub("\n"," ",x,fixed = T)); unlist(strsplit(x, "[[:space:]]+"))}
 chopVec=function(x){ x[1:length(x)-1];}
 
 inc <- function(x,y=1) { 
@@ -3692,3 +3700,47 @@ normalize=function(x) {
 }
 
 shush=function(...) invisible(capture.output(suppressMessages(suppressPackageStartupMessages(suppressWarnings(...)))))
+
+
+
+plot_counties=function(df,yvar,
+                       discrete=is.factor(df[[yvar]]),main=yvar,ylab=yvar,
+                       low=NA,high=NA,
+                       legend.position="right",na.value="lightgray",
+                       print=T){
+  g=plot_usmap(regions = 'counties',data=df,
+               value=yvar,lines=NA) + ggtitle(main)
+  if(!is.na(low)){
+    if(discrete){
+      g=g+scale_fill_manual(values =
+                              c(colorRampPalette(c(low, high))( length(unique(df[[yvar]])) )),
+                            name= ylab,na.value=na.value)
+    }else{
+      g=g+scale_fill_continuous(low=low, high=high, 
+                                guide="colorbar",na.value=na.value,name = ylab)
+    }
+  }else{
+    if(discrete){
+      g=g+scale_fill_manual(values =
+                              c(rainbow( length(unique(df[[yvar]])) )),
+                            name= ylab,na.value=na.value)
+    }else{
+      g=g+scale_fill_continuous(name = ylab,na.value=na.value)
+    }
+  }
+  if(legend.position=='bottom'){
+    g=g+theme(legend.position="top",legend.direction="horizontal",
+              plot.title = element_text(hjust = 0.5))   
+  }else{
+    g=g+theme(legend.position=legend.position,plot.title = element_text(hjust = 0.5)) 
+  }
+  if(print){
+    print(g)
+  }else{
+    g
+  }
+}  
+
+
+#https://stackoverflow.com/a/7660073/4634775
+invwhich <- function(indices, totlength) is.element(seq_len(totlength), indices)
