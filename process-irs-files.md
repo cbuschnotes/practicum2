@@ -635,13 +635,13 @@ Noticed a lot of skew
 
     hist(d2$unemployed.ratio)
 
-![](./img-process-irs-files/media/rId24.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId24.png)
+
 
     plot(density(asinh(d2$contributions.ratio)))
 
-![](./img-process-irs-files/media/rId25.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId25.png)
+
 
 May need to transform or winsor data With outliers:
 
@@ -771,8 +771,8 @@ County Plots of Derived Data
     ## Warning in self$bind(): The following regions were missing and are being
     ## set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId28.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId28.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -785,8 +785,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId29.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId29.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -799,8 +799,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId30.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId30.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -813,8 +813,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId31.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId31.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -827,8 +827,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId32.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId32.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -841,8 +841,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId33.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId33.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -855,8 +855,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId34.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId34.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -869,8 +869,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId35.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId35.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -883,8 +883,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId36.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId36.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -897,8 +897,8 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId37.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId37.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 1000, 2000, 2158, 4000, 5000,
@@ -911,9 +911,9 @@ height="4.0421052055993in"}
     ## Warning in super$initialize(map.df, user.df): The following regions were
     ## missing and are being set to NA: 46113, 15005, 51515, 2270
 
-![](./img-process-irs-files/media/rId38.png){width="5.0526312335958in"
-height="4.0421052055993in"}![](./img-process-irs-files/media/rId39.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-irs-files/media/rId38.png)
+![](./img-process-irs-files/media/rId39.png)
+
 
 Another option for county maps:
 <https://stackoverflow.com/questions/25875877/remove-border-lines-in-ggplot-map-choropleth>

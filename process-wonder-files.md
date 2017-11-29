@@ -270,8 +270,8 @@ Process IRS data files
 
     barplot(table(d$fips,sort(d$Age.Grouping)),main='Counties with >=10 mortality',col=2:4)
 
-![](./img-process-wonder-files/media/rId25.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId25.png)
+
 
     local({
       .=round((apply(table(d$fips,sort(d$Age.Grouping)),2,FUN=function(x) sum(x>0))/3142)*100  )
@@ -281,8 +281,8 @@ height="4.0421052055993in"}
       .
     })
 
-![](./img-process-wonder-files/media/rId26.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId26.png)
+
 
     ##  ADULT SENIOR  YOUTH 
     ##     97     97     46
@@ -396,8 +396,8 @@ Noticed a lot of skew
 
     plot(density(log(d$Population)),main='log(Age Group Populations) Density')
 
-![](./img-process-wonder-files/media/rId27.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId27.png)
+
 
     require(binom)
 
@@ -453,40 +453,40 @@ height="4.0421052055993in"}
             " big counties ",sum(d$Population>=round(10*1/priori) ))
     }
 
-![](./img-process-wonder-files/media/rId28.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId28.png)
+
 
     ## ADULT 0.003633996 2751.792 
     ## ADULT 0.00360521 2773.764
 
-![](./img-process-wonder-files/media/rId29.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId29.png)
+
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##    10.0    35.0    77.0   236.3   197.0 15835.0 
     ## ADULT priori 0.00360521 prioriweight 2773.764 need at least a pop of this size 2773.764  small counties  2709  big counties  13130
 
-![](./img-process-wonder-files/media/rId30.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId30.png)
+
 
     ## SENIOR 0.04299806 232.5686 
     ## SENIOR 0.04298043 232.664
 
-![](./img-process-wonder-files/media/rId31.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId31.png)
+
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##      10     101     210     624     501   45604 
     ## SENIOR priori 0.04298043 prioriweight 232.664 need at least a pop of this size 232.664  small counties  465  big counties  17620
 
-![](./img-process-wonder-files/media/rId32.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId32.png)
+
 
     ## YOUTH 0.0008552847 11692.01 
     ## YOUTH 0.000729517 13707.7
 
-![](./img-process-wonder-files/media/rId33.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId33.png)
+
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   10.00   14.00   24.00   54.51   57.00 1182.00 
@@ -519,8 +519,8 @@ height="4.0421052055993in"}
     }
     legend("topleft",legend = c('SENIOR','ADULT','YOUTH','Overall'),col=c('red','green','blue','black'),pch=c(20,20,20,NA),lty=c(NA,NA,NA,1))
 
-![](./img-process-wonder-files/media/rId34.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId34.png)
+
 
     ###done with graph of overall by population
 
@@ -547,8 +547,8 @@ height="4.0421052055993in"}
     }
     legend("bottomleft",legend = c('SENIOR','ADULT','YOUTH','Overall'),col=c('red','green','blue','black'),pch=c(20,20,20,NA),lty=c(NA,NA,NA,1))
 
-![](./img-process-wonder-files/media/rId35.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId35.png)
+
 
     ###done with graph of overall by population
 
@@ -626,8 +626,8 @@ De-leveraged outliers via transformation:
     ## sahie.pct.uninsured =max( 2.6 ,min( 38.2299999999999 , sahie.pct.uninsured )); //limits are  0.8 2.6 38.2299999999999 52.5 
     ## }
 
-![](./img-process-wonder-files/media/rId36.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId36.png)
+
 
     library(dplyr)
     library(choroplethr)
@@ -697,8 +697,8 @@ County Plots of Derived Data
     ## 30069, 31009, 31085, 31117, 38007, 46017, 46137, 41069, 48359, 48393, 8053,
     ## 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013, 16025, 16033
 
-![](./img-process-wonder-files/media/rId39.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId39.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -713,8 +713,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId40.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId40.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -729,8 +729,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId41.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId41.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -745,8 +745,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId42.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId42.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -872,8 +872,8 @@ height="4.0421052055993in"}
     ## 22105, 45047, 45051, 45059, 45069, 45087, 46015, 46025, 46037, 46049,
     ## 46057, 221
 
-![](./img-process-wonder-files/media/rId43.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId43.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -887,8 +887,8 @@ height="4.0421052055993in"}
     ## 30069, 31009, 31085, 31117, 38007, 46017, 46137, 41069, 48359, 48393, 8053,
     ## 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013, 16025, 16033
 
-![](./img-process-wonder-files/media/rId44.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId44.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -903,8 +903,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId45.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId45.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -919,8 +919,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId46.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId46.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -935,8 +935,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId47.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId47.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -951,8 +951,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId48.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId48.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1078,8 +1078,8 @@ height="4.0421052055993in"}
     ## 22105, 45047, 45051, 45059, 45069, 45087, 46015, 46025, 46037, 46049,
     ## 46057, 221
 
-![](./img-process-wonder-files/media/rId49.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId49.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1093,8 +1093,8 @@ height="4.0421052055993in"}
     ## 30069, 31009, 31085, 31117, 38007, 46017, 46137, 41069, 48359, 48393, 8053,
     ## 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013, 16025, 16033
 
-![](./img-process-wonder-files/media/rId50.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId50.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1109,8 +1109,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId51.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId51.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1125,8 +1125,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId52.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId52.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1141,8 +1141,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId53.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId53.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1157,8 +1157,8 @@ height="4.0421052055993in"}
     ## 41069, 48359, 48393, 8053, 8057, 8111, 49031, 2195, 2230, 6003, 2068, 2013,
     ## 16025, 16033
 
-![](./img-process-wonder-files/media/rId54.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId54.png)
+
 
     ## Warning in super$initialize(map.df, user.df): Your data.frame contains the
     ## following regions which are not mappable: 2201, 2280
@@ -1284,9 +1284,9 @@ height="4.0421052055993in"}
     ## 22105, 45047, 45051, 45059, 45069, 45087, 46015, 46025, 46037, 46049,
     ## 46057, 221
 
-![](./img-process-wonder-files/media/rId55.png){width="5.0526312335958in"
-height="4.0421052055993in"}![](./img-process-wonder-files/media/rId56.png){width="5.0526312335958in"
-height="4.0421052055993in"}
+![](./img-process-wonder-files/media/rId55.png)
+![](./img-process-wonder-files/media/rId56.png)
+
 
 Another option for county maps:
 <https://stackoverflow.com/questions/25875877/remove-border-lines-in-ggplot-map-choropleth>

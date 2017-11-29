@@ -98,8 +98,8 @@ The analytics escalator goes from hindsight to foresight, with that in
 mind the goal of this project is not to be purely predictive focused but
 rather prescriptive in nature.
 
-![](./img-readme/media/image1.png){width="3.9654811898512685in"
-height="3.5349037620297463in"}
+![](./img-readme/media/image1.png)
+
 
 In this paper, the population being studied are those assigned to age
 groups. As a whole, the age groups population sizes are lognormal
@@ -116,8 +116,8 @@ the national Mortality rate is 1 in 1169 to be represented.
 There are 3142 counties in the USA, however not all counties meet the
 greater than 10 deaths criteria for inclusion.
 
-![](./img-readme/media/image2.png){width="3.9654811898512685in"
-height="3.5349037620297463in"}
+![](./img-readme/media/image2.png)
+
 
 Binomial model
 --------------
@@ -131,16 +131,16 @@ count/population\*100k to get a per-100k capita, for sufficiently small
 populations, there can be an outlier numeric behavior. The found source
 of the issue is shown in the mortality rate in different age groups.
 
-![](./img-readme/media/image3.png){width="3.9654811898512685in"
-height="3.5349037620297463in"}
+![](./img-readme/media/image3.png)
+
 
 The clipping unfortunately introduces some bias as those counties with a
 very low population and a very low incidence of mortality are not
 represented. To address that, weighting and modeling as a binomial
 process minimizes the leverage that the low population counties exert.
 
-![](./img-readme/media/image4.png){width="3.9654811898512685in"
-height="3.5349037620297463in"}
+![](./img-readme/media/image4.png)
+
 
 The darker lines are the priori trend lines based the total populations.
 Notice how for lower populations, the number of deaths are higher than
@@ -166,21 +166,21 @@ Known Death Rates
 The death rate maps are they using the median rates over the five-year
 study period.
 
-![C:\\Users\\a02700a\\practicum2\\images\\senior-death-rates-actuals.png](./img-readme/media/image5.png){width="5.354166666666667in"
-height="5.305555555555555in"}
+![C:\\Users\\a02700a\\practicum2\\images\\senior-death-rates-actuals.png](./img-readme/media/image5.png)
+
 
 The senior death rates map highlights that in rural farming communities
 the mortality rate among senior citizens is rather high.
 
-![C:\\Users\\a02700a\\practicum2\\images\\adult-death-rates-actuals.png](./img-readme/media/image6.png){width="5.354166666666667in"
-height="5.3in"}
+![C:\\Users\\a02700a\\practicum2\\images\\adult-death-rates-actuals.png](./img-readme/media/image6.png)
+
 
 The counties in gray lack sufficient information to be accounted for.
 The counties in red are those in which the adult mortality rate is
 higher.
 
-![C:\\Users\\a02700a\\practicum2\\images\\youth-death-rates-actuals.png](./img-readme/media/image7.png){width="5.361805555555556in"
-height="5.310416666666667in"}
+![C:\\Users\\a02700a\\practicum2\\images\\youth-death-rates-actuals.png](./img-readme/media/image7.png)
+
 
 The above map shows sparseness, that is because mortality rates for
 youth tend to fall below the threshold of 10 per county. Nonetheless,
@@ -231,14 +231,14 @@ important.
 Cross validation and tree pruning is utilized to prevent overfitting in
 addition to a test hold out sample.
 
-![](./img-readme/media/image8.png){width="5.052083333333333in"
-height="4.041666666666667in"}
+![](./img-readme/media/image8.png)
 
-![](./img-readme/media/image9.png){width="5.052083333333333in"
-height="4.041666666666667in"}
 
-![](./img-readme/media/image10.png){width="5.052083333333333in"
-height="4.041666666666667in"}
+![](./img-readme/media/image9.png)
+
+
+![](./img-readme/media/image10.png)
+
 
 In the above cross validation results, the youth tree has a chosen
 complexity parameter that reduces the cross-validation errors. The
@@ -248,8 +248,8 @@ not warrant it.
 The decision trees to reveal the individual importance the predictor
 features and an individual course of action or a county to undertake.
 
-![](./img-readme/media/image11.png){width="5.833333333333333in"
-height="8.333333333333334in"}
+![](./img-readme/media/image11.png)
+
 
 In regards to the senior citizen important variables, obesity and
 physical activity play a major role. However, one should note that high
@@ -259,21 +259,21 @@ to greater community concerns such as housing. One of the side benefits
 of the Affordable Care Act is a more holistic view of the patients’
 situation.
 
-![](./img-readme/media/image12.png){width="5.833333333333333in"
-height="8.333333333333334in"}
+![](./img-readme/media/image12.png)
+
 
 Adult risks are predominant by motor vehicle accidents but exercise and
 personal health issues still have a role to play.
 
-![](./img-readme/media/image13.png){width="5.833333333333333in"
-height="8.333333333333334in"}
+![](./img-readme/media/image13.png)
+
 
 Problems in the youth age group are predominated by lack of English
 proficiency and access to exercise opportunities. The following tree
 views give more direct insight into the underlying causes of mortality.
 
-![](./img-readme/media/image14.png){width="5.833333333333333in"
-height="5.833333333333333in"}
+![](./img-readme/media/image14.png)
+
 
 Above one can see the splits around social associations. CHR (2017)
 postulated that social associations can be helpful for community
@@ -281,31 +281,31 @@ well-being. However, this analysis shows an over-reliance on social
 associations may be a poor substitute for proper governmental
 organization.
 
-![](./img-readme/media/image15.png){width="5.833333333333333in"
-height="5.833333333333333in"}
+![](./img-readme/media/image15.png)
 
-![](./img-readme/media/image16.png){width="5.833333333333333in"
-height="5.833333333333333in"}
+
+![](./img-readme/media/image16.png)
+
 
 Lack of proficiency in English or the lack of multilingual services
 deeply effects certain counties. Patient Navigators have been shown to
 assist in this area.
 
-![](./img-readme/media/image17.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image17.png)
+
 
 The decision tree has some difficulty in predicting the exact mortality
 rate for seniors living in counties. However, the general shape the
 intensity of the mortality rates show some similarity to the actuals.
 
-![](./img-readme/media/image18.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image18.png)
+
 
 Visually comparing the adult predicted mortality rates with the actual
 mortality rates show a strong visual similarity of the heat maps.
 
-![](./img-readme/media/image19.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image19.png)
+
 
 The youth fitted heat map fills in a lot of the missing data from the
 actual map. In the above map, metropolitan areas tend to have a more
@@ -352,10 +352,10 @@ three clusters or determined to be optimal. However, it is admitted that
 there is a bit of subjectivity to the number of clusters. The dataset
 for clustering was standardized.
 
-![](./img-readme/media/image20.png){width="5.833333333333333in"
-height="4.166666666666667in"}![](./img-readme/media/image21.png){width="5.833333333333333in"
-height="4.166666666666667in"}![](./img-readme/media/image22.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image20.png)
+![](./img-readme/media/image21.png)
+![](./img-readme/media/image22.png)
+
 
 \#\# SENIOR cluster= 1 deathRate per 100k: 867.6311 counties: 554\
 \#\# SENIOR cluster= 2 deathRate per 100k: 1074.51 counties: 394\
@@ -367,10 +367,10 @@ One can see in the pattern, the metropolitan areas have a better
 environment for senior citizens with the beltway of America being one of
 the one of the worst.
 
-![](./img-readme/media/image23.png){width="5.833333333333333in"
-height="4.166666666666667in"}![](./img-readme/media/image24.png){width="5.833333333333333in"
-height="4.166666666666667in"}![](./img-readme/media/image25.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image23.png)
+![](./img-readme/media/image24.png)
+![](./img-readme/media/image25.png)
+
 
 \#\# ADULT cluster= 1 deathRate per 100k: 1612.417 counties: 1285\
 \#\# ADULT cluster= 2 deathRate per 100k: 1939.683 counties: 856\
@@ -380,12 +380,12 @@ height="4.166666666666667in"}
 The clustering identifies the high population metropolitan areas in
 addition to Colorado being a favorable environment for adult longevity.
 
-![](./img-readme/media/image26.png){width="5.833333333333333in"
-height="4.166666666666667in"}![](./img-readme/media/image27.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+![](./img-readme/media/image26.png)
+![](./img-readme/media/image27.png)
 
-![](./img-readme/media/image28.png){width="5.833333333333333in"
-height="4.166666666666667in"}
+
+![](./img-readme/media/image28.png)
+
 
 \#\# YOUTH cluster= 1 deathRate per 100k: 3473.614 counties: 433\
 \#\# YOUTH cluster= 2 deathRate per 100k: 1416.39 counties: 1040\
@@ -405,26 +405,26 @@ chart is to remember that the bar charts are by magnitude of standard
 deviation. Thus, a very tall bar represents an extreme value while a
 very low bar represents a very small value.
 
-![](./img-readme/media/image29.png){width="5.833333333333333in"
-height="2.7215277777777778in"}
+![](./img-readme/media/image29.png)
 
-![](./img-readme/media/image30.png){width="5.833333333333333in"
-height="2.7215277777777778in"}
 
-![](./img-readme/media/image31.png){width="5.833333333333333in"
-height="2.7215277777777778in"}
+![](./img-readme/media/image30.png)
+
+
+![](./img-readme/media/image31.png)
+
 
 The following bar charts select only the top important fields. Thus, to
 make the charts far more readable.
 
-![](./img-readme/media/image32.png){width="5.835416666666666in"
-height="4.164583333333334in"}
+![](./img-readme/media/image32.png)
 
-![](./img-readme/media/image33.png){width="5.835416666666666in"
-height="4.164583333333334in"}
 
-![](./img-readme/media/image34.png){width="5.835416666666666in"
-height="4.164583333333334in"}
+![](./img-readme/media/image33.png)
+
+
+![](./img-readme/media/image34.png)
+
 
 The bar charts give greater insight into those geographic areas.
 
