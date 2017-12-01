@@ -188,12 +188,36 @@ Load libraries
     }
 
 
+    #this checks to see if a var was renamed
+    sapply(qw('diabetes.pct_diabetic pct_diabetic.diabetes'),checkVar)
 
+    ## diabetes.pct_diabeticnot na=24566
 
+    ##                      Year
+    ## diabetes.pct_diabetic 2010 2011 2012 2013 2014 2015
+    ##                 FALSE 6125 6120    0    0    0    0
+    ##                 TRUE     0    0 6114 6120 6157 6175
+
+    ## pct_diabetic.diabetesnot na=6120
+
+    ##                      Year
+    ## pct_diabetic.diabetes 2010 2011 2012 2013 2014 2015
+    ##                 FALSE 6125    0 6114 6120 6157 6175
+    ##                 TRUE     0 6120    0    0    0    0
+
+    ##         diabetes.pct_diabetic pct_diabetic.diabetes
+    ## Min.                  3.20000              3.000000
+    ## 1st Qu.               9.00000              8.500000
+    ## Median               10.50000              9.800000
+    ## Mean                 10.58208              9.922827
+    ## 3rd Qu.              12.00000             11.300000
+    ## Max.                 21.60000             18.200000
+    ## NA's              12245.00000          30691.000000
 
     ##              #thisVar becomes thatVar
     varsToCombine=
-      c(some_college_post_secondary_education.psed='some_college_post_secondary_education.pct',
+      c(pct_diabetic.diabetes='diabetes.pct_diabetic',
+        some_college_post_secondary_education.psed='some_college_post_secondary_education.pct',
         some_college_post_secondary_education.pct_psed='some_college_post_secondary_education.pct',
         access_to_healthy_foods.pct.x='access_to_healthy_foods.pct_food',
         access_to_recreational_facilities.rec_facility_rate='access_to_recreational_facilities.rec_fac_rate',
@@ -208,6 +232,12 @@ Load libraries
       print(table(sign(bigdata[[ varsToCombine[n]  ]]),bigdata$Year,dnn=c(varsToCombine[n],'Year (after)')))
     }
 
+    ##                      Year (before)
+    ## diabetes.pct_diabetic 2010 2011 2012 2013 2014 2015
+    ##                     1    0    0 6114 6120 6157 6175
+    ##                      Year (after)
+    ## diabetes.pct_diabetic 2010 2011 2012 2013 2014 2015
+    ##                     1    0 6120 6114 6120 6157 6175
     ##                                          Year (before)
     ## some_college_post_secondary_education.pct 2010 2011 2012 2013 2014 2015
     ##                                         1    0    0    0 6120 6157    0
@@ -300,103 +330,13 @@ Load libraries
     ## [3] "air_pollution_particulate_matter.average_daily_pm2_5"
     ## [4] "air_pollution_particulate_matter.average_daily_pm25" 
     ## [5] "diabetic_monitoring.pct_receiving_hba1c"             
-    ## [6] "some_college_post_secondary_education.pct_psed"      
-    ## [7] "some_college_post_secondary_education.psed"
+    ## [6] "pct_diabetic.diabetes"                               
+    ## [7] "some_college_post_secondary_education.pct_psed"      
+    ## [8] "some_college_post_secondary_education.psed"
 
     ignore=unique(predictors$column[predictors$predictor==0])
     discardVars=c(ignore)
     predictorVarsRaw=unique(predictors$column[predictors$predictor==1 & predictors$column!=yvar])
-
-    sapply(qw('other_primary_care_providers.pcp_rate
-    previous_other_primary_care_providers_data.pcp_rate
-              previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate
-              primary_care_physicians.pcp_rate
-              '),checkVar)
-
-    ## other_primary_care_providers.pcp_ratenot na=6093
-
-    ##                                      Year
-    ## other_primary_care_providers.pcp_rate 2010 2011 2012 2013 2014 2015
-    ##                                 FALSE 6125 6120 6114 6120 6157   82
-    ##                                 TRUE     0    0    0    0    0 6093
-
-    ## previous_other_primary_care_providers_data.pcp_ratenot na=12152
-
-    ##                                                    Year
-    ## previous_other_primary_care_providers_data.pcp_rate 2010 2011 2012 2013
-    ##                                               FALSE 6125 6120 6114 6120
-    ##                                               TRUE     0    0    0    0
-    ##                                                    Year
-    ## previous_other_primary_care_providers_data.pcp_rate 2014 2015
-    ##                                               FALSE  105   75
-    ##                                               TRUE  6052 6100
-
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_ratenot na=12068
-
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2010
-    ##                                                                    FALSE 6125
-    ##                                                                    TRUE     0
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2011
-    ##                                                                    FALSE    0
-    ##                                                                    TRUE  6120
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2012
-    ##                                                                    FALSE  166
-    ##                                                                    TRUE  5948
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2013
-    ##                                                                    FALSE 6120
-    ##                                                                    TRUE     0
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2014
-    ##                                                                    FALSE 6157
-    ##                                                                    TRUE     0
-    ##                                                                         Year
-    ## previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate 2015
-    ##                                                                    FALSE 6175
-    ##                                                                    TRUE     0
-
-    ## primary_care_physicians.pcp_ratenot na=30073
-
-    ##                                 Year
-    ## primary_care_physicians.pcp_rate 2010 2011 2012 2013 2014 2015
-    ##                            FALSE 6125    0  166  132  160  155
-    ##                            TRUE     0 6120 5948 5988 5997 6020
-
-    ##         other_primary_care_providers.pcp_rate
-    ## Min.                                  0.00000
-    ## 1st Qu.                              31.53828
-    ## Median                               47.44958
-    ## Mean                                 56.16747
-    ## 3rd Qu.                              69.98600
-    ## Max.                               1245.88749
-    ## NA's                              30718.00000
-    ##         previous_other_primary_care_providers_data.pcp_rate
-    ## Min.                                                0.00000
-    ## 1st Qu.                                            31.91699
-    ## Median                                             48.63715
-    ## Mean                                               57.29750
-    ## 3rd Qu.                                            72.25067
-    ## Max.                                             1348.36309
-    ## NA's                                            24659.00000
-    ##         previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate
-    ## Min.                                                                     0.00000
-    ## 1st Qu.                                                                 52.90000
-    ## Median                                                                  79.95000
-    ## Mean                                                                    90.16054
-    ## 3rd Qu.                                                                116.00000
-    ## Max.                                                                   793.00000
-    ## NA's                                                                 24743.00000
-    ##         primary_care_physicians.pcp_rate
-    ## Min.                             0.00000
-    ## 1st Qu.                         35.48784
-    ## Median                          53.22924
-    ## Mean                            59.47338
-    ## 3rd Qu.                         75.62539
-    ## Max.                           631.93810
-    ## NA's                          6738.00000
 
     average.out=function(bigdata){
       shush({
@@ -480,7 +420,7 @@ same fips county
     fullness()
 
     ##     2010     2011     2012     2013     2014     2015 
-    ## 295.1571 297.1160 297.0833 296.9588 296.9251 297.0322
+    ## 294.1607 296.1165 296.0870 295.9634 295.9289 296.0363
 
     require(usmap)
 
@@ -596,30 +536,36 @@ same fips county
     year=0
     importance=data.frame()
     trees=list()
+    perf.table=NULL
     for(age in unique(bigdata$Age.Grouping)){
-      shush({
-        d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k),] 
-        set.seed(7)
-        trainset=runif(nrow(d))<0.8
-        label=paste(age,ifelse(year==0,'',year))
-        mean(is.na(d$Death.per.100k))
-        
-        d=winsor1Df(d,ignore = ignore) 
-        
-        #trees handle missing data
-        #d=impute(d,ignore = ignore,missing.threshold = 0.25)
-        
-        require(MASS)
-        
-        predictorVars=intersect(names(d),predictorVarsRaw)
-        predictorVars=predictorVarsRaw
-        
-        require(rpart)
-        require(rpart.plot)
-        library(partykit)
-        require(dplyr)
-        summary(d$Population)
-      }) #end of shush output
+      
+      d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k),] 
+      set.seed(7)
+      trainset=runif(nrow(d))<0.8
+      label=paste(age,ifelse(year==0,'',year))
+      mean(is.na(d$Death.per.100k))
+      
+      d=winsor1Df(d,ignore = ignore,trace=F) 
+      
+      #trees handle missing data
+      #d=impute(d,ignore = ignore,missing.threshold = 0.25)
+      
+      require(MASS)
+      
+      predictorVars=intersect(names(d),predictorVarsRaw)
+
+      colinearvars=caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = T)
+      colinearpos=caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = F)
+      catln('co-linear variables to be ignored:',caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = T))
+      if(! setequal(predictorVars[colinearpos],colinearvars)) stop('vars mismatch')
+      predictorVars=predictorVars[-colinearpos]
+      
+      require(rpart)
+      require(rpart.plot)
+      library(partykit)
+      require(dplyr)
+      summary(d$Population)
+      
       mtree=rpart(ezformula(c(yvar,predictorVars)),d[trainset,],weights = d$Population[trainset],
                   control = rpart.control(cp = 0.005))
       #printcp(mtree) # display the results 
@@ -674,18 +620,51 @@ same fips county
             '\nfitted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree,d)),
             '\nweighted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree,d),weights = d$Population),
             '\nfitted Death.per.100k rsq=',rsq(d$Death.per.100k,(predict(mtree,d))))
-      catln(label,'test',
-            '\nrmse deaths=',rmse(d$Deaths[!trainset],((predict(mtree,d[!trainset,]))/100000)*d$Population[!trainset]),
-            '\nrmse Deaths by priori=',rmse(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
-            '\ntree Deaths rsq=',rsq(d$Deaths[!trainset],(predict(mtree,d[!trainset,])/100000)*d$Population[!trainset]),
-            '\nprior Deaths rsq=',rsq(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
-            
-            '\nfitted Death.per.100k rmse=',rmse(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))),
-            '\nweighted Death.per.100k rmse=',rmse(d$Death.per.100k[!trainset],predict(mtree,d[!trainset,]),weights = d$Population[!trainset]),
-            '\nfitted Death.per.100k rsq=',rsq(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))))
-      
-      
+      .=data.frame(#'Age Group'=label,
+            'Deaths RMSE'=rmse(d$Deaths[!trainset],((predict(mtree,d[!trainset,]))/100000)*d$Population[!trainset]),
+            'Deaths by Priori RMSE'=rmse(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
+            'Tree Deaths RSq'=rsq(d$Deaths[!trainset],(predict(mtree,d[!trainset,])/100000)*d$Population[!trainset]),
+            'Priori Deaths RSq'=rsq(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
+            'Fitted Death.per.100k RMSE'=rmse(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))),
+            'Weighted Death.per.100k RMSE'=rmse(d$Death.per.100k[!trainset],predict(mtree,d[!trainset,]),weights = d$Population[!trainset]),
+            'Fitted Death.per.100k RSq'=rsq(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))))
+      rownames(.)=age
+      if(is.null(perf.table))perf.table=.
+      else perf.table=rbind(perf.table,.)
     }  
+
+    ## Loading required package: MASS
+
+    ## co-linear variables to be ignored: pct_of_children_eligible_for_free_lunch teen_births.birth_rate homicides.homicide_rate sexually_transmitted_infections.rates_per_100000 excessive_drinking.pct high_housing_costs.pct violent_crime_rate hiv_prevalence_rate hiv_rate commuting_alone.pct_drive
+
+    ## Loading required package: rpart
+
+    ## Loading required package: rpart.plot
+
+    ## Loading required package: grid
+
+    ## Loading required package: dplyr
+
+    ## Warning: package 'dplyr' was built under R version 3.4.2
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following object is masked _by_ '.GlobalEnv':
+    ## 
+    ##     coalesce
+
+    ## The following object is masked from 'package:MASS':
+    ## 
+    ##     select
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
 
     ## SENIOR cp=0.005
 
@@ -698,106 +677,99 @@ same fips county
 
 
     ##    node counties deaths.pred deaths.act  age.pop dr100k.fit dr100k.group
-    ## 1  2443       18        8331       8096   341083   2442.609     2373.616
+    ## 1  2674       45       21588      21659   807286   2674.206     2682.940
     ## 2  3196       68      115344     115441  3609119   3195.912     3198.592
     ## 3  3263       91      161255     163354  4941412   3263.334     3305.816
     ## 4  3404       29       78373      78255  2302246   3404.182     3399.072
-    ## 5  3689      488      804212     806502 21800523   3688.956     3699.462
-    ## 6  3757      223      672525     674100 17901841   3756.736     3765.535
-    ## 7  3780      270      246091     246583  6510895   3779.675     3787.237
+    ## 5  3660       95      107655     106612  2941527   3659.823     3624.376
+    ## 6  3689      488      804212     806502 21800523   3688.956     3699.462
+    ## 7  3757      223      672525     674100 17901841   3756.736     3765.535
     ## 8  3796       93      293166     291992  7722843   3796.091     3780.887
     ## 9  4083      437      341294     339971  8359615   4082.653     4066.826
     ## 10 4121      636      776557     778067 18843798   4121.023     4129.035
-    ## 11 4148      779      992607     992122 23930410   4147.888     4145.863
+    ## 11 4128      713     1093669    1095347 26495287   4127.786     4134.120
     ## 12 4195      466      666555     669173 15889744   4194.878     4211.352
-    ## 13 4233      579      331819     330757  7839300   4232.765     4219.216
-    ## 14 4424     1566      456308     456279 10313613   4424.326     4424.046
-    ## 15 4449     2038     1157043    1157498 26009674   4448.509     4450.260
-    ## 16 4568      598      258440     258423  5657841   4567.829     4567.520
-    ## 17 4586      197      325972     326373  7107596   4586.246     4591.890
-    ## 18 4768      991      445676     446079  9347843   4767.685     4771.999
-    ## 19 4818     3984      959949     959437 19922227   4818.483     4815.912
-    ## 20 4960     4521     2188147    2186906 44112484   4960.380     4957.567
+    ## 13 4233      589      332330     331236  7850776   4233.081     4219.150
+    ## 14 4268      165       18587      18448   435522   4267.786     4235.837
+    ## 15 4424     1566      456308     456279 10313613   4424.326     4424.046
+    ## 16 4449     2038     1157043    1157498 26009674   4448.509     4450.260
+    ## 17 4568      598      258440     258423  5657841   4567.829     4567.520
+    ## 18 4586      197      325972     326373  7107596   4586.246     4591.890
+    ## 19 4767     1030      449956     450335  9439133   4766.921     4770.936
+    ## 20 4818     3984      959949     959437 19922227   4818.483     4815.912
+    ## 21 4960     4521     2188147    2186906 44112484   4960.380     4957.567
     ## SENIOR test data 
     ##    node counties deaths.pred deaths.act age.pop dr100k.fit dr100k.group
-    ## 1  2443        5        1145       1294   46875   2442.609     2760.533
+    ## 1  2674       11        3378       3833  126323   2674.206     3034.285
     ## 2  3196       14       26165      26361  818703   3195.912     3219.849
     ## 3  3263       21       54365      56478 1665945   3263.334     3390.148
     ## 4  3404        7       11472      11354  336987   3404.182     3369.269
-    ## 5  3689      104      165680     168229 4491256   3688.956     3745.701
-    ## 6  3757       40      121589     123175 3236555   3756.736     3805.744
-    ## 7  3780       52       40410      40910 1069143   3779.675     3826.429
+    ## 5  3660       17       20872      19829  570292   3659.823     3476.991
+    ## 6  3689      104      165680     168229 4491256   3688.956     3745.701
+    ## 7  3757       40      121589     123175 3236555   3756.736     3805.744
     ## 8  3796       16       36541      35372  962590   3796.091     3674.669
     ## 9  4083       76       57433      56305 1406756   4082.653     4002.471
     ## 10 4121      129      178252     179772 4325441   4121.023     4156.154
-    ## 11 4148      154      210486     210036 5074530   4147.888     4139.024
+    ## 11 4128      139      221235     222921 5359658   4127.786     4159.239
     ## 12 4195       97      198648     201252 4735485   4194.878     4249.871
-    ## 13 4233      110       65433      64371 1545873   4232.765     4164.055
-    ## 14 4424      321       90473      90426 2044898   4424.326     4422.030
-    ## 15 4449      452      248280     248736 5581190   4448.509     4456.684
-    ## 16 4568      119       47256      47230 1034531   4567.829     4565.354
-    ## 17 4586       33       49314      49715 1075255   4586.246     4623.554
-    ## 18 4768      192       89167      89574 1870237   4767.685     4789.446
-    ## 19 4818      804      191822     191275 3980966   4818.483     4804.738
-    ## 20 4960      866      430585     429279 8680491   4960.380     4945.331
+    ## 13 4233      113       65760      64666 1553472   4233.081     4162.676
+    ## 14 4268       33        4561       4457  106880   4267.786     4170.097
+    ## 15 4424      321       90473      90426 2044898   4424.326     4422.030
+    ## 16 4449      452      248280     248736 5581190   4448.509     4456.684
+    ## 17 4568      119       47256      47230 1034531   4567.829     4565.354
+    ## 18 4586       33       49314      49715 1075255   4586.246     4623.554
+    ## 19 4767      200       90096      90479 1890033   4766.921     4787.165
+    ## 20 4818      804      191822     191275 3980966   4818.483     4804.738
+    ## 21 4960      866      430585     429279 8680491   4960.380     4945.331
     ## SENIOR  all 
-    ## rmse deaths= 100.9629 
+    ## rmse deaths= 100.7995 
     ## rmse Deaths by priori= 251.1529 
-    ## tree Deaths rsq= 0.9960968 
+    ## tree Deaths rsq= 0.996113 
     ## prior Deaths rsq= 0.984624 
-    ## fitted Death.per.100k rmse= 1924.501 
-    ## weighted Death.per.100k rmse= 438.0129 
-    ## fitted Death.per.100k rsq= 0.04537871 
-    ## SENIOR  test 
-    ## rmse deaths= 109.1264 
-    ## rmse Deaths by priori= 236.7213 
-    ## tree Deaths rsq= 0.9958717 
-    ## prior Deaths rsq= 0.9857348 
-    ## fitted Death.per.100k rmse= 1912.41 
-    ## weighted Death.per.100k rmse= 444.3723 
-    ## fitted Death.per.100k rsq= 0.03661804
+    ## fitted Death.per.100k rmse= 1923.5 
+    ## weighted Death.per.100k rmse= 435.1074 
+    ## fitted Death.per.100k rsq= 0.04584812 
+    ## co-linear variables to be ignored: pct_of_children_eligible_for_free_lunch teen_births.birth_rate homicides.homicide_rate adjusted.gross.income.avg sexually_transmitted_infections.rates_per_100000 excessive_drinking.pct high_housing_costs.pct violent_crime_rate hiv_prevalence_rate hiv_rate commuting_alone.pct_drive
 
     ## ADULT cp=0.005
 
     ## ADULT  tree depth is 5 
     ## ADULT all data 
     ##    node counties deaths.pred deaths.act   age.pop dr100k.fit dr100k.group
-    ## 1   229      394      368068     359954 160821853   228.8667     223.8216
-    ## 2   253      279      250001     250189  99002162   252.5209     252.7106
-    ## 3   307      818      564495     562305 183595110   307.4673     306.2745
-    ## 4   309      699      322070     320320 104257201   308.9189     307.2402
-    ## 5   341      290      120430     120678  35340468   340.7706     341.4726
-    ## 6   357      592      292721     291970  81986902   357.0339     356.1179
-    ## 7   373      485      150654     150114  40423618   372.6872     371.3522
-    ## 8   416      919      359276     359233  86417573   415.7447     415.6944
-    ## 9   480     1152      395272     395729  82419739   479.5840     480.1386
-    ## 10  486      800       66539      66539  13678719   486.4424     486.4417
-    ## 11  499     2277      355343     356459  71172707   499.2683     500.8366
+    ## 1   236      191       71400      71231  30253811   236.0030     235.4447
+    ## 2   241      628      628286     622234 260634916   241.0600     238.7378
+    ## 3   300      319      222774     223156  74311496   299.7840     300.2981
+    ## 4   309      870      466598     464074 151008722   308.9876     307.3160
+    ## 5   352      800      463522     464005 131596720   352.2293     352.5962
+    ## 6   374      653      162150     162096  43327334   374.2434     374.1195
+    ## 7   383      438      145181     145163  37915070   382.9116     382.8636
+    ## 8   436     1258      492113     491294 112942122   435.7212     434.9963
+    ## 9   491      799       69216      69439  14109818   490.5498     492.1325
+    ## 10  499     2277      355343     356459  71172707   499.2683     500.8366
+    ## 11  539      840      203304     202061  37697675   539.3013     536.0039
     ## 12  621      848      114734     114954  18471374   621.1452     622.3359
     ## 13  650      632       42934      42128   6605965   649.9298     637.7267
-    ## 14  653      368       38247      37722   5854339   653.3037     644.3426
-    ## 15  714     1460       59280      59331   8303426   713.9179     714.5364
-    ## 16  767     2141      192141     190801  25052181   766.9651     761.6143
-    ## 17  975     1679       64271      64459   6593752   974.7333     977.5770
+    ## 14  714     1460       59280      59331   8303426   713.9179     714.5364
+    ## 15  767     2141      192141     190801  25052181   766.9651     761.6143
+    ## 16  975     1679       64271      64459   6593752   974.7333     977.5770
     ## ADULT test data 
     ##    node counties deaths.pred deaths.act  age.pop dr100k.fit dr100k.group
-    ## 1   229       67       54115      49319 23644875   228.8667     208.5822
-    ## 2   253       51       69879      70270 27672470   252.5209     253.9347
-    ## 3   307      168      126375     124198 41102034   307.4673     302.1700
-    ## 4   309      162       61823      60092 20012557   308.9189     300.2715
-    ## 5   341       59       22672      22920  6653131   340.7706     344.4995
-    ## 6   357      124       58857      58106 16484990   357.0339     352.4782
-    ## 7   373       95       27546      27006  7391090   372.6872     365.3859
-    ## 8   416      205       75328      75285 18118930   415.7447     415.5047
-    ## 9   480      235       89485      89942 18658857   479.5840     482.0338
-    ## 10  486      153       11908      11899  2448066   486.4424     486.0572
-    ## 11  499      473       70386      71502 14097781   499.2683     507.1862
+    ## 1   236       36        9671       9547  4097974   236.0030     232.9688
+    ## 2   241      116      126929     124353 52654624   241.0600     236.1673
+    ## 3   300       71       58548      58943 19530162   299.7840     301.8050
+    ## 4   309      201      100354      97849 32478198   308.9876     301.2760
+    ## 5   352      152       85822      86305 24365446   352.2293     354.2106
+    ## 6   374      147       35972      35918  9611845   374.2434     373.6848
+    ## 7   383       83       24101      24083  6294194   382.9116     382.6225
+    ## 8   436      259       96444      95625 22134275   435.7212     432.0223
+    ## 9   491      142       10734      10949  2188245   490.5498     500.3553
+    ## 10  499      473       70386      71502 14097781   499.2683     507.1862
+    ## 11  539      173       54478      53215 10101556   539.3013     526.8000
     ## 12  621      171       22225      22443  3578062   621.1452     627.2390
     ## 13  650      116        8625       7815  1327054   649.9298     588.8984
-    ## 14  653       61        8294       7750  1269519   653.3037     610.4674
-    ## 15  714      285       11498      11541  1610491   713.9179     716.6138
-    ## 16  767      411       40411      39057  5268944   766.9651     741.2681
-    ## 17  975      322       12365      12455  1268526   974.7333     981.8482
+    ## 14  714      285       11498      11541  1610491   713.9179     716.6138
+    ## 15  767      411       40411      39057  5268944   766.9651     741.2681
+    ## 16  975      322       12365      12455  1268526   974.7333     981.8482
 
     ## Warning in bind_rows_(x, .id): Unequal factor levels: coercing to character
 
@@ -811,23 +783,16 @@ same fips county
 
 
     ## ADULT  all 
-    ## rmse deaths= 74.8 
+    ## rmse deaths= 70.36103 
     ## rmse Deaths by priori= 233.1597 
-    ## tree Deaths rsq= 0.9853134 
+    ## tree Deaths rsq= 0.9872463 
     ## prior Deaths rsq= 0.9451815 
-    ## fitted Death.per.100k rmse= 259.8712 
-    ## weighted Death.per.100k rmse= 78.97165 
-    ## fitted Death.per.100k rsq= 0.5058604 
-    ## ADULT  test 
-    ## rmse deaths= 84.64957 
-    ## rmse Deaths by priori= 242.0419 
-    ## tree Deaths rsq= 0.9839259 
-    ## prior Deaths rsq= 0.9433995 
-    ## fitted Death.per.100k rmse= 251.6016 
-    ## weighted Death.per.100k rmse= 78.71772 
-    ## fitted Death.per.100k rsq= 0.5119184
+    ## fitted Death.per.100k rmse= 261.9283 
+    ## weighted Death.per.100k rmse= 79.12766 
+    ## fitted Death.per.100k rsq= 0.5002931 
+    ## co-linear variables to be ignored: teen_births.birth_rate children_eligible_for_free_lunch.pct food_insecurity.pct_insecure wages.avg homicides.homicide_rate sexually_transmitted_infections.chlamydia_rate sexually_transmitted_infections.rates_per_100000 violent_crime.rate hiv_prevalence.rate hiv_prevalence_rate driving_alone_to_work.pct_drive households_with_high_housing_costs.pct sahie.pct.uninsured binge_drinking.pct
 
-    ## YOUTH cp=0.0173159759897631
+    ## YOUTH cp=0.0173159759897632
 
     ## YOUTH  tree depth is 3 
     ## YOUTH all data 
@@ -860,15 +825,27 @@ same fips county
     ## prior Deaths rsq= 0.9117817 
     ## fitted Death.per.100k rmse= 446.975 
     ## weighted Death.per.100k rmse= 85.34004 
-    ## fitted Death.per.100k rsq= 0.3502687 
-    ## YOUTH  test 
-    ## rmse deaths= 42.4409 
-    ## rmse Deaths by priori= 76.01757 
-    ## tree Deaths rsq= 0.9084195 
-    ## prior Deaths rsq= 0.909443 
-    ## fitted Death.per.100k rmse= 464.2714 
-    ## weighted Death.per.100k rmse= 90.60464 
-    ## fitted Death.per.100k rsq= 0.3094672
+    ## fitted Death.per.100k rsq= 0.3502687
+
+    require(gridExtra)
+
+    ## Loading required package: gridExtra
+
+    ## Warning: package 'gridExtra' was built under R version 3.4.1
+
+    ## 
+    ## Attaching package: 'gridExtra'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     combine
+
+    g <- tableGrob(signif(t(perf.table),2))
+    grid.newpage()
+    grid.draw(g)
+
+![](./img-modeling2/media/rId33.png)
+
 
     for(age in unique(bigdata$Age.Grouping)){
       mtree=trees[[age]]
@@ -880,17 +857,17 @@ same fips county
       catln(age,'very important vars:',names(mtree$variable.importance)[(mtree$variable.importance/max(mtree$variable.importance)*100)>50])
     }
 
-![](./img-modeling2/media/rId33.png)
-
-
-    ## SENIOR very important vars: adult_obesity.pct_obese physical_inactivity.pct_physically_inactive high_housing_costs.pct college_degrees.pct diabetes.pct_diabetic
-
 ![](./img-modeling2/media/rId34.png)
 
 
-    ## ADULT very important vars: motor_vehicle_crash_deaths.mv_mortality_rate diabetes.pct_diabetic
+    ## SENIOR very important vars: adult_obesity.pct_obese physical_inactivity.pct_physically_inactive college_degrees.pct households_with_high_housing_costs.pct
 
 ![](./img-modeling2/media/rId35.png)
+
+
+    ## ADULT very important vars: motor_vehicle_crash_deaths.mv_mortality_rate
+
+![](./img-modeling2/media/rId36.png)
 
 
     ## YOUTH very important vars: demographics.pct_not_proficient_in_english access_to_exercise_opportunities.pct_with
@@ -900,9 +877,9 @@ same fips county
       prp(mtree,varlen=ceiling(max(nchar(names(mtree$variable.importance)))),cex=0.8,nn=F,main=age,box.palette="GnRd",fallen.leaves = F)
     }
 
-![](./img-modeling2/media/rId36.png)
 ![](./img-modeling2/media/rId37.png)
 ![](./img-modeling2/media/rId38.png)
+![](./img-modeling2/media/rId39.png)
 
 
     for(age in unique(bigdata$Age.Grouping)){
@@ -914,9 +891,9 @@ same fips county
       )
     }
 
-![](./img-modeling2/media/rId39.png)
 ![](./img-modeling2/media/rId40.png)
 ![](./img-modeling2/media/rId41.png)
+![](./img-modeling2/media/rId42.png)
 
 
     #importance
@@ -949,16 +926,30 @@ Compute and plot wss for k = 1 to k = 17:
     age='SENIOR'
     age='YOUTH'
     allclusters=list()
+    allcentermeans=list()
     for(age in unique(bigdata$Age.Grouping)){
       shush({
-        data=as.data.frame(aggregate(bigdata[,names(trees[[age]]$variable.importance)],
+        mtree=trees[[age]]
+        vip=names(mtree$variable.importance)[(mtree$variable.importance/max(mtree$variable.importance))>0.3]
+        data=as.data.frame(aggregate(bigdata[,vip],
                                      list(fips=bigdata$fips),FUN=function(x) mean(x,na.rm=T)))
         fips=data$fips
         data$fips=NULL
-        data=winsor1Df(data)
-        data=impute(data,missing.threshold = 0.1)
+        data=winsor1Df(data,trace=F)
+        odata=data
+        data=impute(data,missing.threshold = 0.1,trace=F)
         data=as.data.frame(scale(keepNumeric( data)))
       })
+      #'VIF Double Check
+      #'
+      #' The HH library allows for the calculation Variance Inflation Factor for checking for collinearity
+      #' without requiring a response variable.
+      catln('removing multi-collinear vars via vif:',names(data)[HH::vif(data)>=10])
+      data=data[,HH::vif(data)<10]
+      
+      # myvif=car::vif(lm(ezformula(c(yvar,predictorVars)), impute(d[,c(yvar,predictorVars)],trace=F)))
+      # names(myvif)[myvif > 10] # problem?
+      # 
       set.seed(7)
       k.max <- 8 # Maximal number of clusters
       wss <- sapply(1:k.max, function(k){set.seed(17); kmeans(data, k, nstart=5 )$tot.withinss})
@@ -968,7 +959,7 @@ Compute and plot wss for k = 1 to k = 17:
       bestK=4
      
       set.seed(7)
-      cl=kmeans(data, bestK, nstart=5 )
+      cl=kmeans(data, bestK, nstart=5,iter.max = 30 )
       print(fviz_cluster(cl, data=data,stand = FALSE, geom = "point",
                          pointsize = 1,main=paste(age,'Cluster Plot')))
       cl$clustering=cl$cluster
@@ -978,45 +969,94 @@ Compute and plot wss for k = 1 to k = 17:
       
       plot_counties(df = data.frame(fips=data$fips,cluster=as.factor(cl$clustering)),
                     main=age,yvar = 'cluster')
+      center.means=NULL
       for(i in sort(unique(cl$clustering))){
         w=impute.df$fips %in% data$fips[cl$clustering==i]
         catln(age,'cluster=',i,'deathRate per 100k:',sum(1.0*impute.df$Deaths[w])/
                 sum(1.0*impute.df$Population[w])*100000,
               'counties:',length(unique(impute.df$fips[w])))
+        .=as.data.frame(colMeans(odata[cl$clustering==i,],na.rm = T))
+        names(.)=paste0('Cluster',i)
+        if(is.null(center.means)) center.means=.
+        else center.means=cbind(center.means,.)
       }
-
+      allcentermeans[[age]]=center.means
       ######################
     }
 
-![](./img-modeling2/media/rId42.png)
+    ## removing multi-collinear vars via vif:
+
 ![](./img-modeling2/media/rId43.png)
 ![](./img-modeling2/media/rId44.png)
-
-
-    ## SENIOR cluster= 1 deathRate per 100k: 867.6311 counties: 554 
-    ## SENIOR cluster= 2 deathRate per 100k: 1074.51 counties: 394 
-    ## SENIOR cluster= 3 deathRate per 100k: 1675.77 counties: 1131 
-    ## SENIOR cluster= 4 deathRate per 100k: 1727.55 counties: 989
-
 ![](./img-modeling2/media/rId45.png)
+
+
+    ## SENIOR cluster= 1 deathRate per 100k: 2393.272 counties: 716 
+    ## SENIOR cluster= 2 deathRate per 100k: 1673.197 counties: 991 
+    ## SENIOR cluster= 3 deathRate per 100k: 1274.992 counties: 942 
+    ## SENIOR cluster= 4 deathRate per 100k: 809.0095 counties: 419 
+    ## removing multi-collinear vars via vif:
+
 ![](./img-modeling2/media/rId46.png)
 ![](./img-modeling2/media/rId47.png)
-
-
-    ## ADULT cluster= 1 deathRate per 100k: 1612.417 counties: 1285 
-    ## ADULT cluster= 2 deathRate per 100k: 1939.683 counties: 856 
-    ## ADULT cluster= 3 deathRate per 100k: 1139.201 counties: 429 
-    ## ADULT cluster= 4 deathRate per 100k: 845.8497 counties: 498
-
 ![](./img-modeling2/media/rId48.png)
+
+
+    ## ADULT cluster= 1 deathRate per 100k: 1294.359 counties: 1304 
+    ## ADULT cluster= 2 deathRate per 100k: 847.3716 counties: 701 
+    ## ADULT cluster= 3 deathRate per 100k: 1875.764 counties: 750 
+    ## ADULT cluster= 4 deathRate per 100k: 1857.314 counties: 313 
+    ## removing multi-collinear vars via vif:
+
 ![](./img-modeling2/media/rId49.png)
 ![](./img-modeling2/media/rId50.png)
+![](./img-modeling2/media/rId51.png)
 
 
-    ## YOUTH cluster= 1 deathRate per 100k: 3473.614 counties: 433 
-    ## YOUTH cluster= 2 deathRate per 100k: 1416.39 counties: 1040 
-    ## YOUTH cluster= 3 deathRate per 100k: 1676.141 counties: 1139 
-    ## YOUTH cluster= 4 deathRate per 100k: 838.4864 counties: 456
+    ## YOUTH cluster= 1 deathRate per 100k: 1884.152 counties: 1022 
+    ## YOUTH cluster= 2 deathRate per 100k: 2344.622 counties: 472 
+    ## YOUTH cluster= 3 deathRate per 100k: 1162.552 counties: 1368 
+    ## YOUTH cluster= 4 deathRate per 100k: 717.2535 counties: 206
+
+    draw.table=function(data,main){
+      library(grid)
+      library(gridExtra)
+      library(gtable)
+      
+      t1 <- tableGrob(data)
+      title <- textGrob(main) #,gp=gpar(fontsize=50)
+      padding <- unit(5,"mm")
+      
+      table <- gtable_add_rows(
+        t1, 
+        heights = grobHeight(title) + padding,
+        pos = 0)
+      table <- gtable_add_grob(
+        table, 
+        title, 
+        1, 1, 1, ncol(table))
+      
+      grid.newpage()
+      grid.draw(table)
+    }
+
+    for(age in unique(bigdata$Age.Grouping)){
+      data=allcentermeans[[age]]
+      
+      names(data)=abbreviate(names.arg = names(data),
+                             minlength = floor(mean(nchar(names(data)))))
+      
+      draw.table(signif(data,2),main=age)
+      gplots::textplot(signif(data,2),valign='top');title(age)
+    }
+
+![](./img-modeling2/media/rId52.png)
+![](./img-modeling2/media/rId53.png)
+![](./img-modeling2/media/rId54.png)
+![](./img-modeling2/media/rId55.png)
+![](./img-modeling2/media/rId56.png)
+![](./img-modeling2/media/rId57.png)
+
 
     for(age in unique(bigdata$Age.Grouping)){
       cl=allclusters[[age]]
@@ -1025,6 +1065,7 @@ Compute and plot wss for k = 1 to k = 17:
                              minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
       ezplot2(data,xlab='cluster',col=darken(rainbow(1+ncol(data))),
               title = paste(age,'Cluster Centers'),type='bar')
+      
     }
 
     ## Loading required package: reshape2
@@ -1033,42 +1074,28 @@ Compute and plot wss for k = 1 to k = 17:
 
     ## Loading required package: ggthemes
 
-![](./img-modeling2/media/rId51.png)
-![](./img-modeling2/media/rId52.png)
-![](./img-modeling2/media/rId53.png)
+![](./img-modeling2/media/rId58.png)
+![](./img-modeling2/media/rId59.png)
+![](./img-modeling2/media/rId60.png)
 
 
-    for(age in unique(bigdata$Age.Grouping)){
-      cl=allclusters[[age]]
-      mtree=trees[[age]]
-      vip=names(mtree$variable.importance)[(
-        mtree$variable.importance/max(mtree$variable.importance))>0.3]
-      vip=base::intersect(colnames(cl$centers),vip)
-      catln(age,vip)
-      data=as.data.frame(cl$centers[,vip,drop=F])
-      
-      names(data)=abbreviate(names.arg = names(data),
-                             minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
-      
-      ezplot2(data,xlab='cluster',col=darken(rainbow(1+ncol(data))),
-              title = paste(age,'Very Important Cluster Centers'),type='bar')
-    }
-
-    ## SENIOR adult_obesity.pct_obese physical_inactivity.pct_physically_inactive high_housing_costs.pct college_degrees.pct diabetes.pct_diabetic households_with_high_housing_costs.pct social_associations.association_rate
-
-![](./img-modeling2/media/rId54.png)
-
-
-    ## ADULT diabetes.pct_diabetic physical_inactivity.pct_physically_inactive
-
-![](./img-modeling2/media/rId55.png)
-
-
-    ## YOUTH demographics.pct_not_proficient_in_english access_to_exercise_opportunities.pct_with social_associations.association_rate
-
-![](./img-modeling2/media/rId56.png)
-
-
+    # 
+    # #+ fig.width=7, fig.height=5
+    # for(age in unique(bigdata$Age.Grouping)){
+    #   cl=allclusters[[age]]
+    #   mtree=trees[[age]]
+    #   vip=names(mtree$variable.importance)[(
+    #     mtree$variable.importance/max(mtree$variable.importance))>0.3]
+    #   vip=base::intersect(colnames(cl$centers),vip)
+    #   catln(age,vip)
+    #   data=as.data.frame(cl$centers[,vip,drop=F])
+    #   
+    #   names(data)=abbreviate(names.arg = names(data),
+    #                          minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
+    #   
+    #   ezplot2(data,xlab='cluster',col=darken(rainbow(1+ncol(data))),
+    #           title = paste(age,'Very Important Cluster Centers'),type='bar')
+    # }
     #### end 
 
     #### end 

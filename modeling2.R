@@ -1,10 +1,10 @@
 #' ---
-#' title: "data merge"
+#' title: "modeling"
 #' author: "Chris Busch cbusch002@regis.edu"
 #' date: "2017"
 #' ---
 #'
-#' This processes and scrubs the files
+#' This does the modeling
 #'
 #'# Load libraries
 #'
@@ -65,12 +65,15 @@ checkVar=function(var1){
 }
 
 
+#this checks to see if a var was renamed
+sapply(qw('diabetes.pct_diabetic pct_diabetic.diabetes'),checkVar)
 
 
 
 ##              #thisVar becomes thatVar
 varsToCombine=
-  c(some_college_post_secondary_education.psed='some_college_post_secondary_education.pct',
+  c(pct_diabetic.diabetes='diabetes.pct_diabetic',
+    some_college_post_secondary_education.psed='some_college_post_secondary_education.pct',
     some_college_post_secondary_education.pct_psed='some_college_post_secondary_education.pct',
     access_to_healthy_foods.pct.x='access_to_healthy_foods.pct_food',
     access_to_recreational_facilities.rec_facility_rate='access_to_recreational_facilities.rec_fac_rate',
@@ -110,11 +113,6 @@ predictorVarsRaw=unique(predictors$column[predictors$predictor==1 & predictors$c
 
 #+ data density
 
-sapply(qw('other_primary_care_providers.pcp_rate
-previous_other_primary_care_providers_data.pcp_rate
-          previous_primary_care_physician_data_used_to_calculate_rankings.pcp_rate
-          primary_care_physicians.pcp_rate
-          '),checkVar)
 
 #+ impute data
 
@@ -244,70 +242,79 @@ for(n in unique(bigdata$Age.Grouping)){
 #+ trees
 
 
-
-# length(unique(bigdata$access_to_healthy_foods.pct.y))
-age='SENIOR'
+age='SENIOR' #hand executing this line allows one to step into the loop to bypass the for loop
 age='ADULT'
 age='YOUTH'
 year=0
 importance=data.frame()
 trees=list()
+perf.table=NULL
 for(age in unique(bigdata$Age.Grouping)){
-  shush({
-    d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k) & (bigdata$Year==year | year==0),] 
-    label=paste(age,ifelse(year==0,'',year))
-    mean(is.na(d$Death.per.100k))
-    
-    d=winsor1Df(d,ignore = c('Death.per.100k',ignore))
-    
-    #trees handle missing data
-    #d=impute(d,ignore = ignore,missing.threshold = 0.25)
-    
-    require(MASS)
-    
-    predictorVars=intersect(names(d),predictorVarsRaw)
-    predictorVars=predictorVarsRaw
-    
-    require(rpart)
-    require(rpart.plot)
-    library(partykit)
-    require(dplyr)
-    summary(d$Population)
-  }) #end of shush output
-  if(age=='SENIOR'){
-    mtree=rpart(ezformula(c(yvar,grep('insured',predictorVars,invert = T,value = T))),
-                d,weights = d$Population,
-                control = rpart.control(minsplit= 2000,cp = 0.0)) 
-  }else{
-    mtree=rpart(ezformula(c(yvar,predictorVars)),d,weights = d$Population,
-                control = rpart.control(minsplit=if(age=='YOUTH') {20}else{ 2000},cp = 0.0))
-  }
+  
+  d=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k),] 
+  set.seed(7)
+  trainset=runif(nrow(d))<0.8
+  label=paste(age,ifelse(year==0,'',year))
+  mean(is.na(d$Death.per.100k))
+  
+  d=winsor1Df(d,ignore = ignore,trace=F) 
+  
+  #trees handle missing data
+  #d=impute(d,ignore = ignore,missing.threshold = 0.25)
+  
+  require(MASS)
+  
+  predictorVars=intersect(names(d),predictorVarsRaw)
+
+  colinearvars=caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = T)
+  colinearpos=caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = F)
+  catln('co-linear variables to be ignored:',caret::findCorrelation(cor(d[,predictorVars],use="pairwise.complete.obs"),names = T))
+  if(! setequal(predictorVars[colinearpos],colinearvars)) stop('vars mismatch')
+  predictorVars=predictorVars[-colinearpos]
+  
+  require(rpart)
+  require(rpart.plot)
+  library(partykit)
+  require(dplyr)
+  summary(d$Population)
+  
+  mtree=rpart(ezformula(c(yvar,predictorVars)),d[trainset,],weights = d$Population[trainset],
+              control = rpart.control(cp = 0.005))
   #printcp(mtree) # display the results 
   plotcp(mtree,main=label) # visualize cross-validation results 
   cp=mtree$cptable[which.min(mtree$cptable[,"xerror"]),"CP"] ##best CP
   message(label,'cp=',cp)
-  if(cp==0){
-    cp=mtree$cptable[which.min(mtree$cptable[,"xerror"]>1.01*min(( mtree$cptable[,"xerror"]))),"CP"]
-  }
-  message(label,'cp=',cp)
   mtree=prune(mtree,cp)
+
+  catln(label,'tree depth is',max(rpart:::tree.depth(as.numeric(rownames(mtree$frame)))))
   
-  message(label)
   
   agedata=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k),] 
-  
-  # str(mtree)
-  catln(age)
-  cbind(agedata,node=round(predict(mtree,agedata,type='vector')),
-        response=predict(mtree,agedata,type='vector')) %>%
+  if(nrow(agedata)!=nrow(d))stop('the winsored and not-winsored should be the same length')
+
+  catln(age,'all data')
+  cbind(agedata,node=round((predict(mtree,agedata,type='vector'))),
+        response=(predict(mtree,agedata,type='vector'))) %>%
     dplyr::group_by(node) %>% 
     dplyr::summarise(counties=length(fips),
-                     deaths.predicted=round(sum(response/100000*Population)),
-                     deaths.actual=sum(Deaths),
-                     pop=sum(Population),
-                     dr100k.mean=mean(Death.per.100k),
+                     deaths.pred=round(sum(response/100000*Population)),
+                     deaths.act=sum(Deaths),
+                     age.pop=sum(Population),
+                     #dr100k.mean=mean(Death.per.100k),
                      dr100k.fit=mean(response)) %>% 
-    dplyr::mutate(dr100k.group=deaths.actual*100000/pop) %>% as.data.frame %>% print
+    dplyr::mutate(dr100k.group=deaths.act*100000/age.pop) %>% as.data.frame %>% print
+  
+  catln(age,'test data')
+  cbind(agedata[!trainset,],node=round((predict(mtree,agedata[!trainset,],type='vector'))),
+        response=(predict(mtree,agedata[!trainset,],type='vector'))) %>%
+    dplyr::group_by(node) %>% 
+    dplyr::summarise(counties=length(fips),
+                     deaths.pred=round(sum(response/100000*Population)),
+                     deaths.act=sum(Deaths),
+                     age.pop=sum(Population),
+                     #dr100k.mean=mean(Death.per.100k),
+                     dr100k.fit=mean(response)) %>% 
+    dplyr::mutate(dr100k.group=deaths.act*100000/age.pop) %>% as.data.frame %>% print
   
   importance=dplyr::bind_rows(importance,
                               cbind(data.frame(age=age,year=year),
@@ -315,27 +322,55 @@ for(age in unique(bigdata$Age.Grouping)){
   
   trees[[age]]=mtree;
   
-  plot(d$Deaths,(predict(mtree)/100000)*d$Population,col=rgb(0,0,0,0.2),main=label);grid()
-  catln(label,
-        '\nrmse deaths=',rmse(d$Deaths,(predict(mtree)/100000)*d$Population),
+  #plot(d$Deaths,(predict(mtree)/100000)*d$Population,col=rgb(0,0,0,0.2),main=label);grid()
+  catln(label,'all',
+        '\nrmse deaths=',rmse(d$Deaths,(predict(mtree,d)/100000)*d$Population),
         '\nrmse Deaths by priori=',rmse(d$Deaths,sum(d$Deaths)/sum(d$Population)*d$Population),
-        '\ntree Deaths rsq=',rsq(d$Deaths,(predict(mtree)/100000)*d$Population),
+        '\ntree Deaths rsq=',rsq(d$Deaths,(predict(mtree,d)/100000)*d$Population),
         '\nprior Deaths rsq=',rsq(d$Deaths,sum(d$Deaths)/sum(d$Population)*d$Population),
         
-        '\nfitted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree)),
-        '\nweighted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree),weights = d$Population),
-        '\nfitted Death.per.100k rsq=',rsq(d$Death.per.100k,(predict(mtree))))
-  
-  
-  
+        '\nfitted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree,d)),
+        '\nweighted Death.per.100k rmse=',rmse(d$Death.per.100k,predict(mtree,d),weights = d$Population),
+        '\nfitted Death.per.100k rsq=',rsq(d$Death.per.100k,(predict(mtree,d))))
+  .=data.frame(#'Age Group'=label,
+        'Deaths RMSE'=rmse(d$Deaths[!trainset],((predict(mtree,d[!trainset,]))/100000)*d$Population[!trainset]),
+        'Deaths by Priori RMSE'=rmse(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
+        'Tree Deaths RSq'=rsq(d$Deaths[!trainset],(predict(mtree,d[!trainset,])/100000)*d$Population[!trainset]),
+        'Priori Deaths RSq'=rsq(d$Deaths[!trainset],sum(d$Deaths[!trainset])/sum(d$Population[!trainset])*d$Population[!trainset]),
+        'Fitted Death.per.100k RMSE'=rmse(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))),
+        'Weighted Death.per.100k RMSE'=rmse(d$Death.per.100k[!trainset],predict(mtree,d[!trainset,]),weights = d$Population[!trainset]),
+        'Fitted Death.per.100k RSq'=rsq(d$Death.per.100k[!trainset],(predict(mtree,d[!trainset,]))))
+  rownames(.)=age
+  if(is.null(perf.table))perf.table=.
+  else perf.table=rbind(perf.table,.)
 }  
 
-#+ fig.width=10, fig.height=10
+require(gridExtra)
+g <- tableGrob(signif(t(perf.table),2))
+grid.newpage()
+grid.draw(g)
+
+
+#+ fig.width=7, fig.height=10
+
+for(age in unique(bigdata$Age.Grouping)){
+  mtree=trees[[age]]
+  data=mtree$variable.importance
+  names(data)=abbreviate(names.arg = names(data),
+                         minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
+  print(lattice::barchart( rev(data/sum(data)*100),main=age,
+                           xlab='Variable Importance'))
+  catln(age,'very important vars:',names(mtree$variable.importance)[(mtree$variable.importance/max(mtree$variable.importance)*100)>50])
+}
+
+#+ fig.width=12, fig.height=12
 for(age in unique(bigdata$Age.Grouping)){
   mtree=trees[[age]]
   prp(mtree,varlen=ceiling(max(nchar(names(mtree$variable.importance)))),cex=0.8,nn=F,main=age,box.palette="GnRd",fallen.leaves = F)
 }
+
 #+ fig.width=7, fig.height=5
+
 for(age in unique(bigdata$Age.Grouping)){
   mtree=trees[[age]]
   print(
@@ -370,77 +405,125 @@ require(cluster)
 age='SENIOR'
 age='YOUTH'
 allclusters=list()
+allcentermeans=list()
 for(age in unique(bigdata$Age.Grouping)){
+  shush({
+    mtree=trees[[age]]
+    vip=names(mtree$variable.importance)[(mtree$variable.importance/max(mtree$variable.importance))>0.3]
+    data=as.data.frame(aggregate(bigdata[,vip],
+                                 list(fips=bigdata$fips),FUN=function(x) mean(x,na.rm=T)))
+    fips=data$fips
+    data$fips=NULL
+    data=winsor1Df(data,trace=F)
+    odata=data
+    data=impute(data,missing.threshold = 0.1,trace=F)
+    data=as.data.frame(scale(keepNumeric( data)))
+  })
+  #'VIF Double Check
+  #'
+  #' The HH library allows for the calculation Variance Inflation Factor for checking for collinearity
+  #' without requiring a response variable.
+  catln('removing multi-collinear vars via vif:',names(data)[HH::vif(data)>=10])
+  data=data[,HH::vif(data)<10]
   
-  data=as.data.frame(aggregate(bigdata[,names(trees[[age]]$variable.importance)],
-                               list(fips=bigdata$fips),FUN=function(x) mean(x,na.rm=T)))
-  fips=data$fips
-  data$fips=NULL
-  data=winsor1Df(data)
-  data=impute(data,missing.threshold = 0.1)
-  data=as.data.frame(scale(keepNumeric( data)))
+  # myvif=car::vif(lm(ezformula(c(yvar,predictorVars)), impute(d[,c(yvar,predictorVars)],trace=F)))
+  # names(myvif)[myvif > 10] # problem?
+  # 
   set.seed(7)
   k.max <- 8 # Maximal number of clusters
   wss <- sapply(1:k.max, function(k){set.seed(17); kmeans(data, k, nstart=5 )$tot.withinss})
   plot(1:k.max, wss, type="b", pch = 19, frame = FALSE,    xlab="Number of clusters K",
        ylab="Total within-clusters sum of squares",main=paste(age,'elbow method'));grid()
-  ####
-  # require(mclust)
-  # d_clust <- Mclust(as.matrix(data), G=1:15, 
-  #                   modelNames = mclust.options("emModelNames"))
-  # d_clust$BIC
-  # plot(d_clust)
-  ####
-  # library(NbClust)
-  # nb <- NbClust(data, diss=NULL, distance = "euclidean", 
-  #               min.nc=2, max.nc=5, method = "kmeans", 
-  #               index = "all", alphaBeale = 0.1)
-  # hist(nb$Best.nc[1,], breaks = max(na.omit(nb$Best.nc[1,])))
-  # fviz_nbclust(nb) + theme_minimal()
-  # mean(t(nb$Best.nc['Number_clusters',]))
-  # ####
-  # 
-  # library(cluster)
-  # clusGap(data, kmeans, 10, B = 100, verbose = interactive())
-  
-  bestK=3
-  #clara
-  # cl=clara(data, bestK, metric = "manhattan",
-  #          correct.d=TRUE,samples=50)
-  # print(fviz_cluster(cl, data=data,stand = FALSE, geom = "point",
-  #                    pointsize = 1))
-  #kmeans
+
+  bestK=4
+ 
   set.seed(7)
-  cl=kmeans(data, bestK, nstart=5 )
+  cl=kmeans(data, bestK, nstart=5,iter.max = 30 )
   print(fviz_cluster(cl, data=data,stand = FALSE, geom = "point",
-                     pointsize = 1))
+                     pointsize = 1,main=paste(age,'Cluster Plot')))
   cl$clustering=cl$cluster
   allclusters[[age]]=cl
-  ###
+ 
   data$fips=fips
-  #map("county",fill=T,col='white',myborder=0,border=NA)
-  #map("county", fips2statecounty[names(fips2statecounty) %in% bigdata$fips[w]],
-  #    add=T,fill=T,col=1+i) 
   
   plot_counties(df = data.frame(fips=data$fips,cluster=as.factor(cl$clustering)),
                 main=age,yvar = 'cluster')
+  center.means=NULL
   for(i in sort(unique(cl$clustering))){
     w=impute.df$fips %in% data$fips[cl$clustering==i]
     catln(age,'cluster=',i,'deathRate per 100k:',sum(1.0*impute.df$Deaths[w])/
             sum(1.0*impute.df$Population[w])*100000,
           'counties:',length(unique(impute.df$fips[w])))
+    .=as.data.frame(colMeans(odata[cl$clustering==i,],na.rm = T))
+    names(.)=paste0('Cluster',i)
+    if(is.null(center.means)) center.means=.
+    else center.means=cbind(center.means,.)
   }
-
+  allcentermeans[[age]]=center.means
   ######################
 }
 
-#+ fig.width=10, fig.height=5
+
+draw.table=function(data,main){
+  library(grid)
+  library(gridExtra)
+  library(gtable)
+  
+  t1 <- tableGrob(data)
+  title <- textGrob(main) #,gp=gpar(fontsize=50)
+  padding <- unit(5,"mm")
+  
+  table <- gtable_add_rows(
+    t1, 
+    heights = grobHeight(title) + padding,
+    pos = 0)
+  table <- gtable_add_grob(
+    table, 
+    title, 
+    1, 1, 1, ncol(table))
+  
+  grid.newpage()
+  grid.draw(table)
+}
+
+#+ fig.width=7, fig.height=3
+for(age in unique(bigdata$Age.Grouping)){
+  data=allcentermeans[[age]]
+  
+  names(data)=abbreviate(names.arg = names(data),
+                         minlength = floor(mean(nchar(names(data)))))
+  
+  draw.table(signif(data,2),main=age)
+  gplots::textplot(signif(data,2),valign='top');title(age)
+}
+
+#+ fig.width=7, fig.height=5
 for(age in unique(bigdata$Age.Grouping)){
   cl=allclusters[[age]]
   data=as.data.frame(cl$centers)
   names(data)=abbreviate(names.arg = names(data),
                          minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
   ezplot2(data,xlab='cluster',col=darken(rainbow(1+ncol(data))),
-        title = paste(age,'Cluster Centers'),type='bar')
+          title = paste(age,'Cluster Centers'),type='bar')
+  
 }
+# 
+# #+ fig.width=7, fig.height=5
+# for(age in unique(bigdata$Age.Grouping)){
+#   cl=allclusters[[age]]
+#   mtree=trees[[age]]
+#   vip=names(mtree$variable.importance)[(
+#     mtree$variable.importance/max(mtree$variable.importance))>0.3]
+#   vip=base::intersect(colnames(cl$centers),vip)
+#   catln(age,vip)
+#   data=as.data.frame(cl$centers[,vip,drop=F])
+#   
+#   names(data)=abbreviate(names.arg = names(data),
+#                          minlength = floor(mean(nchar(names(data)))+sd(nchar(names(data)))))
+#   
+#   ezplot2(data,xlab='cluster',col=darken(rainbow(1+ncol(data))),
+#           title = paste(age,'Very Important Cluster Centers'),type='bar')
+# }
+#### end 
+
 #### end 

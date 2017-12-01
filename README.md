@@ -204,12 +204,19 @@ handle missing data.
 Feature Selection
 -----------------
 
-Over 300 predictor variables are accumulated, of those 92 were chosen.
-Only those variables that are mutable through community action are of
-the 92 initial predictor variables. Variables such as the ethnic nature
-of the community were left out of the analysis as they cannot be
-changed. Population size is left out as well since de-population need
-not be considered.
+Over 300 predictor variables are accumulated, of those about 90 were
+chosen. Only those variables that are mutable through community action
+are of the 92 initial predictor variables. Variables such as the ethnic
+nature of the community were left out of the analysis as they cannot be
+changed. E.g. population size is left out as well since de-population
+need not be considered. Of those variables, highly correlated variables
+were removed via caret::findCorrelation. The rpart decision trees are
+used for variable selection with cross-validation and pruning via the
+important fields attribute for the construction of decision trees. For
+K-means, only the top most important fields are utilized based on each
+variable account for at least 30% of the contribution of the top most
+variable. Finally, a variance inflation factor check is done to ensure
+no multi-collinearity for the K-Means variables.
 
 Decision Trees
 --------------
@@ -217,21 +224,20 @@ Decision Trees
 Decision trees give insight into why it makes decisions. Decision trees
 are favorable due to their interpretable nature.
 
-To address the binomial nature of the data, weighted learning will be
+To address the binomial nature of the data, weighted learning is
 utilized. The weighting reduces the outlier effect of the death rate in
-small counties. Even though this will cause the learning methods to not
-have such a high rate of death in the small counties, it will more
-accurately predict the actual number of deaths over groups of counties.
-In addition, it is shown that it more accurately predicts the reasons
-for the higher death rate in over the entire set of counties. One must
-keep in mind, for this study, the exact number of deaths isn't
-important, it is the reasons behind those deaths that are truly
-important.
+small counties. Even though this causes the learning methods to not have
+such a high rate of death in the small counties, it more accurately
+predicts the actual number of deaths over groups of counties. In
+addition, it is shown that it more accurately predicts the reasons for
+the higher death rate in over the entire set of counties. One must keep
+in mind, for this study, the exact number of deaths is not important, it
+is the reasons behind those deaths that are truly important.
 
 Cross validation and tree pruning is utilized to prevent overfitting in
 addition to a test hold out sample.
 
-![](./img-readme/media/image8.png)
+­­­ ![](./img-readme/media/image8.png)
 
 
 ![](./img-readme/media/image9.png)
@@ -350,12 +356,12 @@ for clustering was standardized.
 ![](./img-readme/media/image23.png)
 
 
-\#\# SENIOR cluster= 1 deathRate per 100k: 867.6311 counties: 554\
-\#\# SENIOR cluster= 2 deathRate per 100k: 1074.51 counties: 394\
-\#\# SENIOR cluster= 3 deathRate per 100k: 1675.77 counties: 1131\
-\#\# SENIOR cluster= 4 deathRate per 100k: 1727.55 counties: 989
+\#\# SENIOR cluster= 1 deathRate per 100k: 2393.272 counties: 716\
+\#\# SENIOR cluster= 2 deathRate per 100k: 1673.197 counties: 991\
+\#\# SENIOR cluster= 3 deathRate per 100k: 1274.992 counties: 942\
+\#\# SENIOR cluster= 4 deathRate per 100k: 809.0095 counties: 419
 
-The clusters for senior citizens happen to be ranked from good to bad.
+The clusters for senior citizens happen to be ranked from bad to good.
 One can see in the pattern, the metropolitan areas have a better
 environment for senior citizens with the beltway of America being one of
 the one of the worst.
@@ -365,25 +371,23 @@ the one of the worst.
 ![](./img-readme/media/image26.png)
 
 
-\#\# ADULT cluster= 1 deathRate per 100k: 1612.417 counties: 1285\
-\#\# ADULT cluster= 2 deathRate per 100k: 1939.683 counties: 856\
-\#\# ADULT cluster= 3 deathRate per 100k: 1139.201 counties: 429\
-\#\# ADULT cluster= 4 deathRate per 100k: 845.8497 counties: 498
+\#\# ADULT cluster= 1 deathRate per 100k: 1294.359 counties: 1304\
+\#\# ADULT cluster= 2 deathRate per 100k: 847.3716 counties: 701\
+\#\# ADULT cluster= 3 deathRate per 100k: 1875.764 counties: 750\
+\#\# ADULT cluster= 4 deathRate per 100k: 1857.314 counties: 313
 
 The clustering identifies the high population metropolitan areas in
 addition to Colorado being a favorable environment for adult longevity.
 
 ![](./img-readme/media/image27.png)
 ![](./img-readme/media/image28.png)
-
-
 ![](./img-readme/media/image29.png)
 
 
-\#\# YOUTH cluster= 1 deathRate per 100k: 3473.614 counties: 433\
-\#\# YOUTH cluster= 2 deathRate per 100k: 1416.39 counties: 1040\
-\#\# YOUTH cluster= 3 deathRate per 100k: 1676.141 counties: 1139\
-\#\# YOUTH cluster= 4 deathRate per 100k: 838.4864 counties: 456
+\#\# YOUTH cluster= 1 deathRate per 100k: 1884.152 counties: 1022\
+\#\# YOUTH cluster= 2 deathRate per 100k: 2344.622 counties: 472\
+\#\# YOUTH cluster= 3 deathRate per 100k: 1162.552 counties: 1368\
+\#\# YOUTH cluster= 4 deathRate per 100k: 717.2535 counties: 206
 
 The youth clusters identify rural Midwest farming being the highest
 concern.
@@ -391,35 +395,25 @@ concern.
 Cluster Characteristics
 -----------------------
 
-Due to the numerous selecting important fields, these bar charts can be
-difficult to read. The following charts illustrate the magnitude of the
-various characteristics that make up a cluster. The way to read the
-chart is to remember that the bar charts are by magnitude of standard
-deviation. Thus, a very tall bar represents an extreme value while a
-very low bar represents a very small value.
+The following charts illustrate the mean values of the various
+characteristics that make up a cluster.
 
 ![](./img-readme/media/image30.png)
-
-
 ![](./img-readme/media/image31.png)
-
-
 ![](./img-readme/media/image32.png)
 
 
-The following bar charts select only the top important fields. Thus, to
-make the charts far more readable.
+The following charts illustrate the magnitude of the various
+characteristics that make up a cluster. The way to read the chart is to
+remember that the bar charts are by magnitude of standard deviation.
+Thus, a very tall bar represents an extreme value while a very low bar
+represents a very small value. The bar charts give greater insight into
+those geographic areas.
 
 ![](./img-readme/media/image33.png)
-
-
 ![](./img-readme/media/image34.png)
-
-
 ![](./img-readme/media/image35.png)
 
-
-The bar charts give greater insight into those geographic areas.
 
 Conclusion
 ==========

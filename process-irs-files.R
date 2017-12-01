@@ -12,7 +12,7 @@
 
 library(stringr)
 library(psych)
-setwd("/practicum2")
+setwd("~/../practicum2")
 source("common.R")
 
 #'
@@ -20,7 +20,7 @@ source("common.R")
 #'
 
 
-for(f in Sys.glob('/practicum2/data/irs/1*.csv')){
+for(f in Sys.glob('data/irs/1*.csv')){
   message('processing ',f)
   fn=2000+as.numeric(str_match(f, '\\/(\\d+)')[,2])
   d=read.csv(f,stringsAsFactors = F)
@@ -45,7 +45,7 @@ for(f in Sys.glob('/practicum2/data/irs/1*.csv')){
   d2$mortgage.ratio=d$N19300/d$N1 #indicator of ownership
   d2$contributions.ratio=d$A19700/d$N1 #indicator of giving?
   d2$taxcredits.ratio = d$N07100/d$N1
-  write.csv(d2,paste0("/practicum2/data/irsclean/",fn,"-irs-soi.csv"),row.names = F)
+  write.csv(d2,paste0("data/irsclean/",fn,"-irs-soi.csv"),row.names = F)
   #summary(d2) 
   #describe(d2)
 }
