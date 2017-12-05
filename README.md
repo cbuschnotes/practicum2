@@ -46,18 +46,18 @@ and speculates that culture and health behaviors may impact those
 mortality rates. This project attempts to identify those cultural and
 health dynamics that lead to specific mortality rates.
 
-A 2012 study reported in the New England Journal of Medicine found that
-states in which Medicaid expansions took place a significant reduction
-in all-cause mortality occurred down about 19.6 death per 100,000 adults
-(Sommers, Baicker, & Epstein, 2012). As part of the Affordable Care Act,
-Patient Navigators have a role to play to engage patients in a holistic
-manner to address more than just the clinical issues concerning their
-health. Patient Navigators help to cut through “red-tape” and assist
-patients with language and cultural issues. As most things related to
-the Affordable Care Act, even the very concept of Patient Navigators is
-facing political attacks. While this study is not about Patient
-Navigators directly, it does give insights into expanded roles they may
-play.
+A 2012 study, reported in the New England Journal of Medicine, found
+that states in which Medicaid expansions took place saw a significant
+reduction in all-cause mortality: down about 19.6 death per 100,000
+adults (Sommers, Baicker, & Epstein, 2012). As part of the Affordable
+Care Act, Patient Navigators have a role to play to engage patients in a
+holistic manner to address more than just the clinical issues concerning
+their health. Patient Navigators help to cut through “red-tape” and
+assist patients with language and cultural issues. As most things
+related to the Affordable Care Act, even the very concept of Patient
+Navigators is facing political attacks. While this study is not about
+Patient Navigators directly, it does give insights into expanded roles
+they may play.
 
 Data Sources
 ============
@@ -198,8 +198,8 @@ missing values for the social economic data. Therefore, for those years
 in which those surveys were not done, the average value for the county
 is utilized. The best description for this would be a hot deck mean
 imputation. However, for those counties where a measure is completely
-missing, those are left absent as rpart decision trees can automatically
-handle missing data.
+missing, those are left absent as *rpart* decision trees can
+automatically handle missing data.
 
 Feature Selection
 -----------------
@@ -218,8 +218,8 @@ variable account for at least 30% of the contribution of the top most
 variable. Finally, a variance inflation factor check is done to ensure
 no multi-collinearity for the K-Means variables.
 
-Decision Trees
---------------
+Decision Tree Modeling
+----------------------
 
 Decision trees give insight into why it makes decisions. Decision trees
 are favorable due to their interpretable nature.
@@ -251,6 +251,8 @@ complexity parameter that reduces the cross-validation errors. The
 senior and adult trees did not need pruning as the cross validation did
 not warrant it.
 
+### Important Variables
+
 The decision trees to reveal the individual importance the predictor
 features and an individual course of action or a county to undertake.
 
@@ -278,46 +280,208 @@ Problems in the youth age group are predominated by lack of English
 proficiency and access to exercise opportunities. The following tree
 views give more direct insight into the underlying causes of mortality.
 
+### Decision Trees
+
 ![](./img-readme/media/image14.png)
 
 
-Above one can see the splits around social associations. CHR (2017)
-postulated that social associations can be helpful for community
-well-being. However, this analysis shows an over-reliance on social
-associations may be a poor substitute for proper governmental
-organization.
+Deciphering the graphical tree can be daunting.
+
+`##  1) root Counties:14460 Death.per.100k:4300  `\
+`##    2) ``adult_obesity.pct_obese< 26 Counties:2191 Death.per.100k:3900``  `\
+`##      4) preventable_hospital_stays.hosp__rate< 57 Counties:1581 Death.per.100k:3800  `\
+`##        8) other_primary_care_providers.pcp_rate< 68 Counties:1052 Death.per.100k:3700  `\
+`##         16) unemployed.ratio< 0.07 Counties:508 Death.per.100k:3600  `\
+`##           32) mammography_screening.pct>=74 Counties:54 Death.per.100k:3200 *`\
+`##           33) mammography_screening.pct< 74 Counties:454 Death.per.100k:3600  `\
+`##             66) median_household_income>=8.1e+04 Counties:70 Death.per.100k:3300 *`\
+`##             67) median_household_income< 8.1e+04 Counties:384 Death.per.100k:3700 *`\
+`##         17) unemployed.ratio>=0.07 Counties:544 Death.per.100k:3900  `\
+`##           34) ``social_associations.association_rate``< 7.3 Counties:183 Death.per.100k:3800 *`\
+`##           35) ``social_associations.association_rate``>=7.3 Counties:361 Death.per.100k:4100 *`\
+`##        9) other_primary_care_providers.pcp_rate>=68 Counties:529 Death.per.100k:4000  `\
+`##         18) adult_obesity.pct_obese< 16 Counties:22 Death.per.100k:3400 *`\
+`##         19) adult_obesity.pct_obese>=16 Counties:507 Death.per.100k:4100 *`\
+`##      5) preventable_hospital_stays.hosp__rate>=57 Counties:610 Death.per.100k:4200  `\
+`##       10) ``social_associations.association_rate``< 6.1 Counties:77 Death.per.100k:3800 *`\
+`##       11) ``social_associations.association_rate``>=6.1 Counties:533 Death.per.100k:4300  `\
+`##         22) unemployed.ratio< 0.099 Counties:369 Death.per.100k:4200 *`\
+`##         23) unemployed.ratio>=0.099 Counties:164 Death.per.100k:4600 *`\
+`##    3) ``adult_obesity.pct_obese>=26 Counties:12269 Death.per.100k:4600``  `\
+`##      6) ``social_associations.association_rate``< 8.8 Counties:2124 Death.per.100k:4200  `\
+`##       12) adult_smoking.pct_smokers< 20 Counties:818 Death.per.100k:4000  `\
+`##         24) primary_care_provider_rate.pcp< 42 Counties:166 Death.per.100k:3200  `\
+`##           48) physical_inactivity.pct_physically_inactive< 24 Counties:34 Death.per.100k:2700 *`\
+`##           49) physical_inactivity.pct_physically_inactive>=24 Counties:132 Death.per.100k:4300 *`\
+`##         25) primary_care_provider_rate.pcp>=42 Counties:652 Death.per.100k:4100  `\
+`##           50) injury_deaths.death_rate< 39 Counties:78 Death.per.100k:3700 *`\
+`##           51) injury_deaths.death_rate>=39 Counties:574 Death.per.100k:4100 *`\
+`##       13) adult_smoking.pct_smokers>=20 Counties:1306 Death.per.100k:4500  `\
+`##         26) income_inequality.ratio< 4.4 Counties:476 Death.per.100k:4200 *`\
+`##         27) income_inequality.ratio>=4.4 Counties:830 Death.per.100k:4800 *`\
+`##      7) ``social_associations.association_rate``>=8.8 Counties:10145 Death.per.100k:4700  `\
+`##       14) physical_inactivity.pct_physically_inactive< 25 Counties:1586 Death.per.100k:4400 *`\
+`##       15) physical_inactivity.pct_physically_inactive>=25 Counties:8559 Death.per.100k:4800  `\
+`##         30) access_to_parks.pct_park< 14 Counties:4422 Death.per.100k:4700  `\
+`##           60) preventable_hospital_stays.hosp__rate< 64 Counties:1244 Death.per.100k:4400 *`\
+`##           61) preventable_hospital_stays.hosp__rate>=64 Counties:3178 Death.per.100k:4800 *`\
+`##         31) access_to_parks.pct_park>=14 Counties:4137 Death.per.100k:4900  `\
+`##           62) median_household_income>=5.2e+04 Counties:480 Death.per.100k:4600 *`\
+`##           63) median_household_income< 5.2e+04 Counties:3657 Death.per.100k:5000 *`
+
+Looking at the top predictor obesity, a major pivot point is the 26%
+obesity mark. Looking further with linear regression, for every
+percentage point that obesity is reduced in the senior population, the
+number of deaths per 100k goes down by 79.
 
 ![](./img-readme/media/image15.png)
 
 
+In the splits chart, above, one can see the splits around social
+associations. CHR (2017) postulated that social associations can be
+helpful for community well-being. However, this analysis shows an
+over-reliance on social associations may be a poor substitute for proper
+governmental organization.
+
 ![](./img-readme/media/image16.png)
 
 
-Lack of proficiency in English or the lack of multilingual services
-deeply effects certain counties. Patient Navigators have been shown to
-assist in this area.
-
 ![](./img-readme/media/image17.png)
+
+
+Unfortunately, the graphical layout suffers from overlaps.
+
+`## ADULT  tree depth is 5 `\
+`## n= 12675 `\
+`## `\
+`## node), split, n, ``yval`\
+`##       * denotes terminal node`\
+`## `\
+`##  1) root Counties:12675 Death.per.100k:360  `\
+`##    ``2) motor_vehicle_crash_deaths.mv_mortality_rate< 17 Counties:5416 Death.per.100k:330``  `\
+`##      4) injury_deaths.death_rate< 54 Counties:1843 Death.per.100k:270  `\
+`##        8) adult_obesity.pct_obese< 25 Counties:512 Death.per.100k:240 *`\
+`##        9) adult_obesity.pct_obese>=25 Counties:1331 Death.per.100k:310  `\
+`##         18) injury_deaths.death_rate< 39 Counties:155 Death.per.100k:240 *`\
+`##         19) injury_deaths.death_rate>=39 Counties:1176 Death.per.100k:320  `\
+`##           38) physical_inactivity.pct_physically_inactive< 25 Counties:670 Death.per.100k:310 *`\
+`##           39) physical_inactivity.pct_physically_inactive>=25 Counties:506 Death.per.100k:370 *`\
+`##      5) injury_deaths.death_rate>=54 Counties:3573 Death.per.100k:390  `\
+`##       10) diabetes.pct_diabetic< 10 Counties:1907 Death.per.100k:350  `\
+`##         20) wages.avg>=36 Counties:896 Death.per.100k:330  `\
+`##           40) physical_inactivity.pct_physically_inactive< 20 Counties:248 Death.per.100k:300 *`\
+`##           41) physical_inactivity.pct_physically_inactive>=20 Counties:648 Death.per.100k:350 *`\
+`##         21) wages.avg< 36 Counties:1011 Death.per.100k:410  `\
+`##           42) chlamydia_rate.rates_per_100000>=2.5e+02 Counties:355 Death.per.100k:380 *`\
+`##           43) chlamydia_rate.rates_per_100000< 2.5e+02 Counties:656 Death.per.100k:490 *`\
+`##       11) diabetes.pct_diabetic>=10 Counties:1666 Death.per.100k:460  `\
+`##         22) median_household_income>=4.1e+04 Counties:999 Death.per.100k:440 *`\
+`##         23) median_household_income< 4.1e+04 Counties:667 Death.per.100k:540 *`\
+`##    ``3) motor_vehicle_crash_deaths.mv_mortality_rate>=17 Counties:7259 Death.per.100k:610``  `\
+`##      6) median_household_income>=3.9e+04 Counties:3495 Death.per.100k:530  `\
+`##       12) mental_health_providers.mph_rate>=0.6 Counties:2320 Death.per.100k:510  `\
+`##         24) access_to_recreational_facilities.rec_fac_rate>=4.5 Counties:1804 Death.per.100k:500 *`\
+`##         25) access_to_recreational_facilities.rec_fac_rate< 4.5 Counties:516 Death.per.100k:650 *`\
+`##       13) mental_health_providers.mph_rate< 0.6 Counties:1175 Death.per.100k:710 *`\
+`##      7) median_household_income< 3.9e+04 Counties:3764 Death.per.100k:740  `\
+`##       14) access_to_recreational_facilities.rec_fac_rate>=0.33 Counties:2407 Death.per.100k:700  `\
+`##         28) motor_vehicle_crash_deaths.mv_mortality_rate< 21 Counties:677 Death.per.100k:620 *`\
+`##         29) motor_vehicle_crash_deaths.mv_mortality_rate>=21 Counties:1730 Death.per.100k:770 *`\
+`##       15) access_to_recreational_facilities.rec_fac_rate< 0.33 Counties:1357 Death.per.100k:970 *`
+
+As indicated above, motor vehicle crashes are a major concern, through
+regression analysis, the crashes may account for 56% of proportion of
+the variance in mortality.
+
+![](./img-readme/media/image18.png)
+
+
+The lower the income, the more mortality inflicted. Job training
+programs not only teach a career but may save a life. This may reflect
+the affordability of healthcare.
+
+![](./img-readme/media/image19.png)
+
+
+![](./img-readme/media/image20.png)
+
+
+Again, reading the graphical tree can be difficult. The text output is
+easier to consume with practice.
+
+`## YOUTH  tree depth is 3 `\
+`## n= 2313 `\
+`## `\
+`## node), split, n, ``yval`\
+`##       * denotes terminal node`\
+`## `\
+`##  1) root Counties:2313 Death.per.100k: 86  `\
+`##    2) ``demographics.pct_not_proficient_in_english>=3.9 Counties:908 Death.per.100k: 69``  `\
+`##      4) social_associations.association_rate< 7.3 Counties:370 Death.per.100k: 57 *`\
+`##      5) social_associations.association_rate>=7.3 Counties:538 Death.per.100k:100  `\
+`##       10) access_to_exercise_opportunities.pct_with>=83 Counties:360 Death.per.100k: 93 *`\
+`##       11) access_to_exercise_opportunities.pct_with< 83 Counties:178 Death.per.100k:240 *`\
+`##    3) ``demographics.pct_not_proficient_in_english< 3.9 Counties:1405 Death.per.100k:170``  `\
+`##      6) access_to_exercise_opportunities.pct_with>=71 Counties:1002 Death.per.100k:150  `\
+`##       12) access_to_exercise_opportunities.pct_with>=86 Counties:408 Death.per.100k:120 *`\
+`##       13) access_to_exercise_opportunities.pct_with< 86 Counties:594 Death.per.100k:220 *`\
+`##      7) access_to_exercise_opportunities.pct_with< 71 Counties:403 Death.per.100k:460 *`
+
+Lack of proficiency in English may appear to negatively affect mortality
+but it does **not**. Why would knowing more English be a bad thing? This
+may be a case of correlation is not causation.
+
+Peering deeper into Node 1, perhaps it is negatively associated with
+social associations rate. More research is in order.
+
+`## Node number 1: 2313 observations,    complexity ``param``=0.1345629`\
+`##   mean=85.66406, MSE=10208.18 `\
+`##   left son=2 (908 ``obs``) right son=3 (1405 ``obs``)`\
+`##   Primary splits:`\
+`##       demographics.pct_not_proficient_in_english   < 3.873321 to the right, improve=0.13456290, (0 missing)`\
+`##       social_associations.association_rate         < 7.547315 to the left,  improve=0.11589750, (1 missing)`\
+`##       high_housing_costs.pct                       < 30.29605 to the right, improve=0.10937370, (0 missing)`\
+`##       motor_vehicle_crash_deaths.mv_mortality_rate < 14.68285 to the left,  improve=0.09595310, (1 missing)`\
+`##       ``long_commute_driving_alone.pct_drives``        < 30.65    to the right, improve=0.09399445, (1 missing)`\
+`##   Surrogate splits:`\
+`##       social_associations.association_rate < 9.795606 to the left,  agree=0.867, ``adj``=0.247, (0 split)`\
+`##       severe_housing_problems.pct          < 16.35279 to the right, agree=0.865, ``adj``=0.234, (0 split)`\
+`##       ``commuting_alone.pct_drive``            < 82.35599 to the left,  agree=0.864, ``adj``=0.232, (0 split)`\
+`##       high_housing_costs.pct               < 31.38978 to the right, agree=0.854, ``adj``=0.172, (0 split)`\
+`##       diabetes.pct_diabetic                < 10.50417 to the left,  agree=0.849, ``adj``=0.147, (0 split)`
+
+![](./img-readme/media/image21.png)
+
+
+![](./img-readme/media/image22.png)
+
+
+More exercise for youth is a life saver. This is also closely related
+with *access to parks* as reported by the rpart summary.
+
+### Prediction Maps
+
+![](./img-readme/media/image23.png)
 
 
 The decision tree has some difficulty in predicting the exact mortality
 rate for seniors living in counties. However, the general shape the
 intensity of the mortality rates show some similarity to the actuals.
 
-![](./img-readme/media/image18.png)
+![](./img-readme/media/image24.png)
 
 
 Visually comparing the adult predicted mortality rates with the actual
 mortality rates show a strong visual similarity of the heat maps.
 
-![](./img-readme/media/image19.png)
+![](./img-readme/media/image25.png)
 
 
 The youth fitted heat map fills in a lot of the missing data from the
 actual map. In the above map, metropolitan areas tend to have a more
 favorable environment.
 
-![](./img-readme/media/image20.png)
+![](./img-readme/media/image26.png)
 
 
 Looking at the performance metrics, with respect to predicting the
@@ -351,9 +515,9 @@ three clusters or determined to be optimal. However, it is admitted that
 there is a bit of subjectivity to the number of clusters. The dataset
 for clustering was standardized.
 
-![](./img-readme/media/image21.png)
-![](./img-readme/media/image22.png)
-![](./img-readme/media/image23.png)
+![](./img-readme/media/image27.png)
+![](./img-readme/media/image28.png)
+![](./img-readme/media/image29.png)
 
 
 \#\# SENIOR cluster= 1 deathRate per 100k: 2393.272 counties: 716\
@@ -366,9 +530,9 @@ One can see in the pattern, the metropolitan areas have a better
 environment for senior citizens with the beltway of America being one of
 the one of the worst.
 
-![](./img-readme/media/image24.png)
-![](./img-readme/media/image25.png)
-![](./img-readme/media/image26.png)
+![](./img-readme/media/image30.png)
+![](./img-readme/media/image31.png)
+![](./img-readme/media/image32.png)
 
 
 \#\# ADULT cluster= 1 deathRate per 100k: 1294.359 counties: 1304\
@@ -379,9 +543,9 @@ the one of the worst.
 The clustering identifies the high population metropolitan areas in
 addition to Colorado being a favorable environment for adult longevity.
 
-![](./img-readme/media/image27.png)
-![](./img-readme/media/image28.png)
-![](./img-readme/media/image29.png)
+![](./img-readme/media/image33.png)
+![](./img-readme/media/image34.png)
+![](./img-readme/media/image35.png)
 
 
 \#\# YOUTH cluster= 1 deathRate per 100k: 1884.152 counties: 1022\
@@ -398,9 +562,9 @@ Cluster Characteristics
 The following charts illustrate the mean values of the various
 characteristics that make up a cluster.
 
-![](./img-readme/media/image30.png)
-![](./img-readme/media/image31.png)
-![](./img-readme/media/image32.png)
+![](./img-readme/media/image36.png)
+![](./img-readme/media/image37.png)
+![](./img-readme/media/image38.png)
 
 
 The following charts illustrate the magnitude of the various
@@ -410,9 +574,9 @@ Thus, a very tall bar represents an extreme value while a very low bar
 represents a very small value. The bar charts give greater insight into
 those geographic areas.
 
-![](./img-readme/media/image33.png)
-![](./img-readme/media/image34.png)
-![](./img-readme/media/image35.png)
+![](./img-readme/media/image39.png)
+![](./img-readme/media/image40.png)
+![](./img-readme/media/image41.png)
 
 
 Conclusion
@@ -426,7 +590,7 @@ mechanism to address some of the issues highlighted. Natale-Pereira,
 Enard, Nevarez and Jones (2011) discuss the role of a Patient Navigator
 and how they can break through literacy barriers and facilitate access
 to care with sensitivity to cultural barriers. Contrary to some
-politician believe, this study suggests that continued use of Patient
+politicians believe, this study suggests that continued use of Patient
 Navigators and the expansion of that program is most likely in order.
 
 The adult age group is most susceptible to accidents. One might presume

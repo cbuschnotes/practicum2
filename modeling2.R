@@ -241,6 +241,9 @@ for(n in unique(bigdata$Age.Grouping)){
 
 #+ trees
 
+#'
+#'#Trees
+#'
 
 age='SENIOR' #hand executing this line allows one to step into the loop to bypass the for loop
 age='ADULT'
@@ -287,7 +290,7 @@ for(age in unique(bigdata$Age.Grouping)){
   mtree=prune(mtree,cp)
 
   catln(label,'tree depth is',max(rpart:::tree.depth(as.numeric(rownames(mtree$frame)))))
-  
+  print_rpart(mtree,digits=2,nlab = 'Counties:',ylab=paste0(yvar,':'))
   
   agedata=bigdata[bigdata$Age.Grouping==age & !is.na(bigdata$Death.per.100k),] 
   if(nrow(agedata)!=nrow(d))stop('the winsored and not-winsored should be the same length')
@@ -320,6 +323,29 @@ for(age in unique(bigdata$Age.Grouping)){
                               cbind(data.frame(age=age,year=year),
                                     as.data.frame(t(as.data.frame(mtree$variable.importance)))))
   
+  #savedPlots=list()
+  for(n in (used.rpart.vars(mtree))){
+    lm.m=lm(ezformula(c(yvar,n)),d[trainset,],weights = d$Population[trainset])
+    s.lm.m=summary(lm.m)
+    c.lm.m=coef(s.lm.m)
+    if(c.lm.m[2,"Pr(>|t|)"]<0.05){
+      catln(n,paste("slope=",signif(c.lm.m[2,"Estimate"],2),
+                    "r^2=",signif(s.lm.m$adj.r.squared,2)))
+      plot(d[trainset,c(n,yvar)],ylab=yvar,
+           xlab=n,main=age,
+           sub=paste0(round(mtree$variable.importance[[n]]/sum(mtree$variable.importance)*100),'% importance'),
+           #col=rgb(0,0,0,0.1/2)
+           col=rgb(0,0,0,(log(d$Population[trainset])/log(max(d$Population[trainset])))/5)
+           );grid()
+      text(mean(d[[n]],na.rm=T),mean(d[[yvar]]),
+           paste("slope=",signif(c.lm.m[2,"Estimate"],2),
+                 "\nr^2=",signif(s.lm.m$adj.r.squared,2)),
+           col=ifelse(c.lm.m[2,"Estimate"]<0,'darkgreen','red'),font=2,cex=1.5)
+      abline(lm.m,col='steelblue')  
+    }
+  }
+  
+  
   trees[[age]]=mtree;
   
   #plot(d$Deaths,(predict(mtree)/100000)*d$Population,col=rgb(0,0,0,0.2),main=label);grid()
@@ -343,13 +369,24 @@ for(age in unique(bigdata$Age.Grouping)){
   rownames(.)=age
   if(is.null(perf.table))perf.table=.
   else perf.table=rbind(perf.table,.)
+  
+  print(summary(mtree))
+  
 }  
+
+#'
+#'# Performance Table
+#'
 
 require(gridExtra)
 g <- tableGrob(signif(t(perf.table),2))
 grid.newpage()
 grid.draw(g)
 
+
+#'
+#'# Variable.Importance Barchart
+#'
 
 #+ fig.width=7, fig.height=10
 
@@ -362,6 +399,10 @@ for(age in unique(bigdata$Age.Grouping)){
                            xlab='Variable Importance'))
   catln(age,'very important vars:',names(mtree$variable.importance)[(mtree$variable.importance/max(mtree$variable.importance)*100)>50])
 }
+
+#'
+#'# prp chart
+#'
 
 #+ fig.width=12, fig.height=12
 for(age in unique(bigdata$Age.Grouping)){
@@ -387,6 +428,11 @@ for(age in unique(bigdata$Age.Grouping)){
 
 
 #+clustering
+
+#'
+#'# Clustering
+#'
+
 #https://stackoverflow.com/questions/23714052/ggplot-mapping-us-counties-problems-with-visualization-shapes-in-r
 
 
