@@ -2593,7 +2593,7 @@ cook.influentials=function(m){
   #this finds those observations that out too influential
   cd=cooks.distance(model = m)
   tossing=which(cd>4/(length(cd)-length(coef(m))))
-  cat("cooking boiling off",length(tossing),"of", length(cd),"is",round(100*length(tossing)/length(cd)),"%")
+  catln("cooking boiling off",length(tossing),"of", length(cd),"is",round(100*length(tossing)/length(cd)),"%")
   return(tossing);
 }
 
@@ -2970,12 +2970,14 @@ ezheatmap.same.breaks=function(act,prd,title=paste(xlab,'vs',ylab),
 ezheatmapz=function(x,y,z,use.heatmap=T,main=rev(as.character(substitute(z)))[1],FUN=mean,
                     bucketx=bunch.decile.index(x),
                     buckety=bunch.decile.index(y),
+                    bucketz=bunch.decile.index(z),
                     ntile=max(length(unique(bucketx)),length(unique(buckety))),autotile=0,col=NULL,...
 ){
   if(autotile>0){
     ntile=autotile
     bucketx=bunch.decile.index(x,ntiles = autotile)
     buckety=bunch.decile.index(y,ntiles = autotile)
+    bucketz=bunch.decile.index(z,ntiles = autotile)
   }
   xlab=paste(rev(as.character(substitute(x)))[1],'decile')
   ylab=paste(rev(as.character(substitute(y)))[1],'decile')
@@ -3005,8 +3007,8 @@ ezheatmapz=function(x,y,z,use.heatmap=T,main=rev(as.character(substitute(z)))[1]
     
     library(RColorBrewer)
     numbreaks=ntile*ntile/2
-    colorz <- colorRampPalette(c("red", "yellow"))(n = numbreaks-1)
-    breaks=sort(quantile(as.vector(ma),probs = seq(1/numbreaks/2,1-1/numbreaks/2,length.out = numbreaks),na.rm = T))
+    breaks=unique(sort(quantile(as.vector(ma),probs = seq(1/numbreaks/2,1-1/numbreaks/2,length.out = numbreaks),na.rm = T)))
+    colorz <- colorRampPalette(c("red", "yellow"))(n = length(breaks)-1)
     #print(breaks)
     #plot(breaks)
     gplots::heatmap.2(ma,dendrogram='none', Rowv=FALSE, Colv=FALSE,trace='none',
@@ -3500,8 +3502,11 @@ McFaddenR2=function(m,llhNull=NULL){# McFadden's R squared
 
 quick.pnorm=function(x,a=mean(x),s=sd(x)) { 1.0/(1.0+exp(-1.69897*(x-a)/s)) }
 ez.pnorm=function(x,a=mean(x),s=sd(x)) { pnorm(x,mean = a,sd = s); }
+
+##https://en.wikipedia.org/wiki/Softmax_function#Softmax_normalization
 softmax.norm=function(x,a=mean(x),s=sd(x),C=-1){ 1.0/(1.0+exp(C*(x-a)/s))}
 softmax.denorm=function(x,a,s,C=-1){ (-log(1/x-1))*s+a }
+softmax=function(x) { exp(x) /sum(exp(x)) }
 
 softmax.norm.tanh=function(x,a=mean(x),s=sd(x),C=-1){ (1.0-exp(C*(x-a)/s))/(1.0+exp(C*(x-a)/s))}
 softmax.denorm.tanh=function(x,a,s,C=-1){ (log((1+x)/(1-x)))*s+a }
@@ -3791,11 +3796,17 @@ print_rpart=function (x, minlength = 0L, spaces = 2L, cp, digits = getOption("di
 }
 
 
+##https://stackoverflow.com/questions/13593196/standard-deviation-of-combined-data
+## N: vector of sizes
+## M: vector of means
+## S: vector of standard deviations - try to use pop.sd
+grand.mean <- function(M, N) {weighted.mean(M, N)}
+grand.sd   <- function(S, M, N) {sqrt(weighted.mean(S^2 + M^2, N) - weighted.mean(M, N)^2)}
 
 
 
 
-
+##eof
 
 
 
